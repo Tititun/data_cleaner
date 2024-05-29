@@ -1,34 +1,17 @@
-/* eslint-disable default-case */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import ReactDOM from 'react-dom'
 import Item from './components/item'
+import { searchReducer } from './utils';
 
 const HOST = 'http://localhost:8000'
 
-const searchReducer = function(state, action) {
-  switch (action.type) {
-    case 'source':
-      return {...state, source: action.value }
-    case 'category':
-      return {...state, category: action.value }
-    case 'name':
-      return {...state, name: action.value }
-    case 'translation':
-      return {...state, translation: action.value }
-    case 'level_1':
-      return {...state, level_1: action.value }
-    case 'level_2':
-      return {...state, level_2: action.value }
-    case 'level_3':
-      return {...state, level_3: action.value }
-  }
-}
+var items, levels;
 
 function App() {
   console.log('rendering table')
-  const [items, setItems] = React.useState([])
+  // const [items, setItems] = React.useState([])
   const [displayIds, setDisplayIds] = React.useState([])
   const [showFilters, setShowFilters] = React.useState(false)
   const [searchFilter, searchDispatcher] = React.useReducer(searchReducer, {
@@ -47,8 +30,9 @@ function App() {
     })
     .then(r => r.json())
     .then(data => {
-      console.log(data)
-      setItems(data)
+      items = data['data'];
+      levels = data['levels']
+      console.log(items)
       setDisplayIds([...Array(items.length).keys()] )
     })
     .catch(err => console.log(err))
@@ -56,6 +40,7 @@ function App() {
   
 
   React.useEffect(() => {
+    if (!items) return; 
     const ids_to_display = [];
     for (const [idx, item] of Object.entries(items)) {
       let to_display = true;
@@ -72,7 +57,8 @@ function App() {
       if (to_display) { ids_to_display.push(idx) }
     }
     setDisplayIds(ids_to_display)
-  }, [searchFilter, items])
+  }, [searchFilter])
+  console.log(items)
 
   return (
     <div className="content m-5">
@@ -125,7 +111,7 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {displayIds.map(idx => <Item item={items[idx]} />)}
+            {items ? displayIds.map(idx => <Item item={items[idx]} levels={levels} />) : null}
           </tbody>
         </table>  
         </div>

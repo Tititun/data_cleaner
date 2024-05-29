@@ -30,6 +30,29 @@ class Item(models.Model):
     level_3 = models.CharField(max_length=200, null=True)
     translation = models.CharField(max_length=200, null=True)
 
+    def infer_levels(self):
+        if not self.category:
+            return [None] * 3
+        levels = self.category.lower().split('/')
+        if len(levels) == 1:
+            return [None, levels[0], None]
+        elif len(levels) == 2:
+            return [levels[0], levels[1], None]
+        else:
+            return [levels[-3], levels[-2], levels[-1]]
+
+    @property
+    def level_1_inferred(self):
+        return self.infer_levels()[0]
+
+    @property
+    def level_2_inferred(self):
+        return self.infer_levels()[1]
+
+    @property
+    def level_3_inferred(self):
+        return self.infer_levels()[2]
+
     class Meta:
         db_table = 'consumer_item'
         unique_together = ('source', 'source_key')

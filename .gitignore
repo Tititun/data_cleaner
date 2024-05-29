@@ -1,0 +1,5 @@
+.idea
+migrations
+node_modules
+bundle.js
+my.cnf

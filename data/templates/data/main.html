@@ -1,0 +1,14 @@
+{% extends 'data/base.html' %}
+{% load static %}
+
+{% block title %}
+Main
+{% endblock %}
+
+{% block content %}
+<div id="root"></div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'data/js/bundle.js' %}"></script>
+{% endblock %}

@@ -25,9 +25,10 @@ class Item(models.Model):
     food_type = models.CharField(max_length=20, null=True)
     item_type = models.CharField(max_length=20, null=True)
     tag = models.CharField(max_length=15, null=True)
-    level_1 = models.CharField(max_length=100, null=True)
-    level_2 = models.CharField(max_length=100, null=True)
-    level_3 = models.CharField(max_length=100, null=True)
+    level_1 = models.CharField(max_length=200, null=True)
+    level_2 = models.CharField(max_length=200, null=True)
+    level_3 = models.CharField(max_length=200, null=True)
+    translation = models.CharField(max_length=200, null=True)
 
     class Meta:
         db_table = 'consumer_item'

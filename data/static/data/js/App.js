@@ -9,7 +9,7 @@ import { searchReducer } from './utils';
 import { headers, HOST } from './constants';
 
 
-var items, levels;
+var levels;
 
 function App() {
   console.log('rendering table')
@@ -23,6 +23,8 @@ function App() {
     source: '', category: '', name: '', translation: '', level_1: '', level_2: '', level_3: ''
   })
   const [url, setUrl] = React.useState(`${HOST}/api/items`)
+  const [items, setItems] = React.useState([])
+
 
   React.useEffect(() => {
     let didCancel = false;
@@ -33,8 +35,7 @@ function App() {
       .then(r => r.json())
       .then(data => {
         if (!didCancel) {
-          items = data['results'];
-          setDisplayIds([...Array(items.length).keys()] )
+          setItems(data['results']);
           setPagination({currentPage: data['page_number'], maxPage: data['max_page'], prev: data['previous'], next: data['next']})
           setIsLoading(false)
         }
@@ -69,6 +70,30 @@ function App() {
     e.preventDefault();
     // window.history.pushState({}, null, e.target.href);
     setUrl(e.target.href + '&' + new URLSearchParams(searchFilter).toString())
+  }
+
+  function updateItem(new_item) {
+    const new_items = []
+    for (let old_item of items) {
+      if (old_item['id'] === new_item['id']) {
+        new_items.push({...old_item, ...new_item})
+      } else {
+        new_items.push(old_item)
+      }
+    }
+    setItems(new_items)
+  }
+
+  function updateItems(new_data) {
+    const new_items = []
+    for (let old_item of items) {
+      if (old_item['category'] === new_data['category']) {
+        new_items.push({...old_item, ...new_data})
+      } else {
+        new_items.push(old_item)
+      }
+    }
+    setItems(new_items)
   }
   
   return (
@@ -122,7 +147,7 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {items && levels && displayIds.map(idx => <Item item={items[idx]} levels={levels} />)}
+            {items && levels && items.map(item => <Item item={item} levels={levels} updateItem={updateItem} updateItems={updateItems} />)}
           </tbody>
         </table>  
         <Pagination {...pagination} onClickFunc={anchorRequest} />

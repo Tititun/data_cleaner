@@ -1,11 +1,13 @@
 /* eslint-disable import/no-anonymous-default-export */
 import React from 'react';
 import { Dropdown } from './dropdown';
+import { HOST, headers } from '../constants';
 
-export default function ({item, levels}) {
+export default function ({item, levels, updateItem, updateItems}) {
   console.log('rendering item')
   const [dropbar, setDropbar] = React.useState({})
   const [item_levels, setItemLevels] = React.useState({level_1: '', level_2: '', level_3: ''})
+  // const [classified, setClassified] = React.useState(item['level_1'] || item['level_2'])
 
   React.useEffect(() => {
     setItemLevels({
@@ -36,14 +38,56 @@ export default function ({item, levels}) {
 
   function closeDropdown(value, level) {
     if (value){
-      item[level] = value;
       setItemLevels(structuredClone({...item_levels, [level]: value}))
     }
     setDropbar(null)
   }
 
+  function saveItem() {
+    const update_data = {
+      id: item['id'],
+      level_1: item_levels['level_1'] || item['level_1_inferred'],
+      level_2: item_levels['level_2'] || item['level_2_inferred'],
+      level_3: item_levels['level_3'] || item['level_3_inferred'],
+    }
+    const body = JSON.stringify(update_data)
+    fetch(`${HOST}/api/set_item_levels`, {
+      method: "POST",
+      headers: headers,
+      body: body}
+     ).then(r => r.json())
+      .then(data => {
+          if (data['status'] === 'success') {
+            updateItem(update_data)
+          }
+        })
+      .catch(err => console.log(err))
+    }
+  
+  function saveAllItems() {
+    const update_data = {
+      category: item['category'],
+      source: item['source'],
+      level_1: item_levels['level_1'] || item['level_1_inferred'],
+      level_2: item_levels['level_2'] || item['level_2_inferred'],
+      level_3: item_levels['level_3'] || item['level_3_inferred'],
+    }
+    const body = JSON.stringify(update_data)
+    fetch(`${HOST}/api/set_items_levels`, {
+      method: "POST",
+      headers: headers,
+      body: body}
+      ).then(r => r.json())
+      .then(data => {
+          if (data['status'] === 'success') {
+            updateItems(update_data)
+          }
+        })
+      .catch(err => console.log(err))
+    }
+
   return (
-      <tr key={item.id}>
+      <tr key={item.id} className={`${item['level_1'] || item['level_2'] ? 'has-background-success-light' : ""}`}>
         <td className='w-5' key={1}>{item.source}</td>
         <td className='w-20'  key={2}>{item.category}</td>
         <td className='w-20'  key={3}>{item.name}</td>
@@ -61,7 +105,10 @@ export default function ({item, levels}) {
            removeDropbar={closeDropdown}/>: item_levels.level_3}
         </td>
         <td className='w-5'  key={8}>
-          <button className='button is-light m-0'>Save</button>
+          <div className='is-flex'>
+            <button className='button is-light m-0 is-primary mr-1' onClick={saveItem}>Save</button>
+            <button className='button is-light m-0 has-background-danger-light' onClick={saveAllItems}>Save all</button>
+          </div>
         </td> 
       </tr>
   )

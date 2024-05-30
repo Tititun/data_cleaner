@@ -1,6 +1,7 @@
 import json
 
 from django.db import connection
+from django.db.models import Q
 from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -12,8 +13,18 @@ from .serializers import ItemSerializer
 
 @api_view(['GET'])
 def items_list(request):
+    filters = Q()
     paginator = ItemPagination()
-    items = Item.objects.all()
+    source = request.GET.get('source')
+    if source:
+        filters &= Q(source__iregex=source)
+    name = request.GET.get('name')
+    if name:
+        filters &= Q(name__iregex=name)
+    category = request.GET.get('category')
+    if category:
+        filters &= Q(category__iregex=category)
+    items = Item.objects.filter(filters)
     result_page = paginator.paginate_queryset(items, request)
     data = ItemSerializer(result_page, many=True).data
     return paginator.get_paginated_response(data)

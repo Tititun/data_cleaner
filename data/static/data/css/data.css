@@ -1,28 +1,54 @@
 .w-5 {
-    width: 5%
+  width: 5%;
 }
 
 .w-10 {
-    width: 10%
+  width: 10%;
 }
 
 .w-15 {
-    width: 15%
+  width: 15%;
 }
 
 .w-20 {
-    width: 20%
+  width: 20%;
 }
 
 .dropdown-menu {
-    max-height: 300px;
-    overflow: scroll;
+  max-height: 300px;
+  overflow: scroll;
 }
 
 .dropdown-item {
-    border: 0.5px solid grey;
+  border: 0.5px solid grey;
 }
 
 .dropdown button {
-    text-wrap: wrap;
+  text-wrap: wrap;
 }
+
+table.is-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.5;
+}
+table.is-loading:after {
+  animation: spinAround 500ms infinite linear;
+  border: 2px solid var(--bulma-loading-color);
+  border-radius: var(--bulma-radius-rounded);
+  border-right-color: transparent;
+  border-top-color: transparent;
+  content: "";
+  display: block;
+  height: 1em;
+  position: relative;
+  width: 1em;
+  position: absolute;
+  top: calc(50% - 2.5em);
+  left: calc(50% - 2.5em);
+  width: 5em;
+  height: 5em;
+  border-width: 0.25em;
+}
+
+/*# sourceMappingURL=data.css.map */

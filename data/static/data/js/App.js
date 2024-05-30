@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable no-unused-vars */
 import React from 'react';
@@ -15,30 +16,33 @@ function App() {
 
   const [displayIds, setDisplayIds] = React.useState([])
   const [showFilters, setShowFilters] = React.useState(false)
+  const [isLoading, setIsLoading] = React.useState(false)
   const [pagination, setPagination] = React.useState({currentPage: 1, maxPage: null, prev: null, next: null})
   
   const [searchFilter, searchDispatcher] = React.useReducer(searchReducer, {
     source: '', category: '', name: '', translation: '', level_1: '', level_2: '', level_3: ''
   })
+  const [url, setUrl] = React.useState(`${HOST}/api/items`)
 
-  function fetchItems(url) {
-    fetch(url, {
-      method: "GET",
-      headers: headers
-    })
-    .then(r => r.json())
-    .then(data => {
-      console.log(data)
-      items = data['results'];
-      setDisplayIds([...Array(items.length).keys()] )
-      setPagination({currentPage: data['page_number'], maxPage: data['max_page'], prev: data['previous'], next: data['next']})
-    })
-    .catch(err => console.log(err))
-  }
-  
   React.useEffect(() => {
-    fetchItems(`${HOST}/api/items`)
-  }, [])
+    let didCancel = false;
+    setIsLoading(true);
+    fetch(url, {
+            method: "GET",
+            headers: headers})
+      .then(r => r.json())
+      .then(data => {
+        if (!didCancel) {
+          items = data['results'];
+          setDisplayIds([...Array(items.length).keys()] )
+          setPagination({currentPage: data['page_number'], maxPage: data['max_page'], prev: data['previous'], next: data['next']})
+          setIsLoading(false)
+        }
+      })
+      .catch(err => console.log(err))
+
+    return () => {didCancel = true}
+  }, [url])
 
   React.useEffect(() => {
     fetch(`${HOST}/api/levels`, {
@@ -47,33 +51,26 @@ function App() {
     })
     .then(r => r.json())
     .then(data => {
-      console.log(data)
       levels = data;
     })
     .catch(err => console.log(err))
   }, [])
   
   React.useEffect(() => {
-    if (!items) return; 
-    const ids_to_display = [];
-    for (const [idx, item] of Object.entries(items)) {
-      let to_display = true;
-      for (const [filter, value] of Object.entries(searchFilter)){
-        if (!value) {
-          continue
-        } else if (item[filter] && item[filter].toLowerCase().search(value.toLowerCase()) === -1) {
-          to_display = false;
-          break
-        } else if (!item[filter]) {
-          to_display = false;
-        }
+    let timeout = setTimeout(() => {
+      if (showFilters) {
+        setUrl(`${HOST}/api/items?` + new URLSearchParams(searchFilter).toString())
       }
-      if (to_display) { ids_to_display.push(idx) }
-    }
-    setDisplayIds(ids_to_display)
+    }, 300)
+    return () => clearTimeout(timeout)
   }, [searchFilter])
-  console.log(items)
-
+  
+  function anchorRequest (e) {
+    e.preventDefault();
+    // window.history.pushState({}, null, e.target.href);
+    setUrl(e.target.href + '&' + new URLSearchParams(searchFilter).toString())
+  }
+  
   return (
     <div className="content m-5">
       <nav class="navbar is-justify-content-center" role="navigation" aria-label="main navigation">
@@ -83,7 +80,7 @@ function App() {
       </nav>  
       <div className='columns'>
         <div key={1} className='column is-9'>
-        <table className="table is-striped is-hoverable">
+        <table className={`table is-striped is-hoverable ${isLoading ? 'is-loading' : ''}`}>
           <thead>
             {
               showFilters ?
@@ -128,7 +125,7 @@ function App() {
             {items && levels && displayIds.map(idx => <Item item={items[idx]} levels={levels} />)}
           </tbody>
         </table>  
-        <Pagination {...pagination} fetchItems={fetchItems} />
+        <Pagination {...pagination} onClickFunc={anchorRequest} />
         </div>
         
         <div key={2} className='column is-3'></div>

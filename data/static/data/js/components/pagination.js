@@ -1,13 +1,7 @@
 import React from 'react';
 import { HOST } from "../constants"
 
-export const Pagination = function({currentPage, maxPage, prev, next, fetchItems}) {
-
-    function goToLink (e) {
-        e.preventDefault()
-        // window.history.pushState({}, null, e.target.href);
-        fetchItems(e.target.href)
-    }
+export const Pagination = function({currentPage, maxPage, prev, next, onClickFunc}) {
 
     const page_numbers = [...Array(maxPage + 1).keys()].filter(
         i => ((i >= currentPage - 3 && i <= currentPage + 3 && i > 0) || (i === 1 || i === maxPage))
@@ -24,16 +18,15 @@ export const Pagination = function({currentPage, maxPage, prev, next, fetchItems
             <li>
                 <a href={`${HOST}/api/items?page=${i}`}
                    className={`pagination-link ${currentPage === i ? 'is-current' : ''}`}
-                   onClick={goToLink}>{i}</a>
+                   onClick={onClickFunc}>{i}</a>
             </li>
         )
     }
-    console.log(page_numbers)
 
     return (
         <nav className="pagination" role="navigation" aria-label="pagination">
-            <a href={prev} className="pagination-previous" disabled={prev ? false : true} onClick={goToLink}>Previous</a>
-            <a href={next} className="pagination-next" disabled={next ? false : true} onClick={goToLink}>Next page</a>
+            <a href={prev} className="pagination-previous" disabled={prev ? false : true} onClick={onClickFunc}>Previous</a>
+            <a href={next} className="pagination-next" disabled={next ? false : true} onClick={onClickFunc}>Next page</a>
             <ul class="pagination-list">
                 {links}
             </ul>

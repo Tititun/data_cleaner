@@ -2,15 +2,18 @@
 import React from 'react';
 import { Dropdown } from './dropdown';
 
-export default React.memo(function ({item, levels}) {
+export default function ({item, levels}) {
   console.log('rendering item')
   const [dropbar, setDropbar] = React.useState({})
-  const [item_levels, setItemLevels] = React.useState({
-    level_1: item['level_1'] || item['level_1_inferred'] || '',
-    level_2: item['level_2'] || item['level_2_inferred'] || '',
-    level_3: item['level_3'] || item['level_3_inferred'] || ''
-  })
+  const [item_levels, setItemLevels] = React.useState({level_1: '', level_2: '', level_3: ''})
 
+  React.useEffect(() => {
+    setItemLevels({
+      level_1: item['level_1'] || item['level_1_inferred'] || '',
+      level_2: item['level_2'] || item['level_2_inferred'] || '',
+      level_3: item['level_3'] || item['level_3_inferred'] || ''
+    })
+  }, [item])
 
   function levelClicked(e) {
     const level = e.target.dataset.level;
@@ -62,4 +65,4 @@ export default React.memo(function ({item, levels}) {
         </td> 
       </tr>
   )
-})
+}

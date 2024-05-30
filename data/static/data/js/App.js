@@ -3,42 +3,56 @@
 import React from 'react';
 import ReactDOM from 'react-dom'
 import Item from './components/item'
+import { Pagination } from './components/pagination';
 import { searchReducer } from './utils';
+import { headers, HOST } from './constants';
 
-const HOST = 'http://localhost:8000'
 
 var items, levels;
 
 function App() {
   console.log('rendering table')
-  // const [items, setItems] = React.useState([])
+
   const [displayIds, setDisplayIds] = React.useState([])
   const [showFilters, setShowFilters] = React.useState(false)
+  const [pagination, setPagination] = React.useState({currentPage: 1, maxPage: null, prev: null, next: null})
+  
   const [searchFilter, searchDispatcher] = React.useReducer(searchReducer, {
     source: '', category: '', name: '', translation: '', level_1: '', level_2: '', level_3: ''
   })
 
-
-  React.useEffect(() => {
-    fetch(`${HOST}/api/items`, {
+  function fetchItems(url) {
+    fetch(url, {
       method: "GET",
-      headers: { "Content-Type": "application/json",
-                 "Access-Control-Allow-Headers": "*",
-                 "Access-Control-Allow-Methods" : "GET,POST,PUT,DELETE,OPTIONS",
-                 "Access-Control-Allow-Origin": "*"
-       }
+      headers: headers
     })
     .then(r => r.json())
     .then(data => {
-      items = data['data'];
-      levels = data['levels']
-      console.log(items)
+      console.log(data)
+      items = data['results'];
       setDisplayIds([...Array(items.length).keys()] )
+      setPagination({currentPage: data['page_number'], maxPage: data['max_page'], prev: data['previous'], next: data['next']})
+    })
+    .catch(err => console.log(err))
+  }
+  
+  React.useEffect(() => {
+    fetchItems(`${HOST}/api/items`)
+  }, [])
+
+  React.useEffect(() => {
+    fetch(`${HOST}/api/levels`, {
+      method: "GET",
+      headers: headers
+    })
+    .then(r => r.json())
+    .then(data => {
+      console.log(data)
+      levels = data;
     })
     .catch(err => console.log(err))
   }, [])
   
-
   React.useEffect(() => {
     if (!items) return; 
     const ids_to_display = [];
@@ -111,10 +125,12 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {items ? displayIds.map(idx => <Item item={items[idx]} levels={levels} />) : null}
+            {items && levels && displayIds.map(idx => <Item item={items[idx]} levels={levels} />)}
           </tbody>
         </table>  
+        <Pagination {...pagination} fetchItems={fetchItems} />
         </div>
+        
         <div key={2} className='column is-3'></div>
       </div>
     </div>

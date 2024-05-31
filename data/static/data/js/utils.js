@@ -15,5 +15,7 @@ export const searchReducer = function(state, action) {
         return {...state, level_2: action.value }
       case 'level_3':
         return {...state, level_3: action.value }
+      case 'levels':
+        return {...state, ...action.value}  
     }
 }

@@ -66,7 +66,6 @@ function App() {
     })
     .then(r => r.json())
     .then(data => {
-      console.log(data)
       setGroups(data);
     })
     .catch(err => console.log(err))
@@ -74,9 +73,7 @@ function App() {
   
   React.useEffect(() => {
     let timeout = setTimeout(() => {
-      if (showFilters) {
         setUrl(`${HOST}/api/items?` + new URLSearchParams(searchFilter).toString())
-      }
     }, 300)
     return () => clearTimeout(timeout)
   }, [searchFilter])
@@ -168,7 +165,7 @@ function App() {
         <Pagination {...pagination} onClickFunc={anchorRequest} />
         </div>
         
-        <Groups key={3} groups={groups} />
+        <Groups key={3} groups={groups} appSetFilters={searchDispatcher} />
       </div>
     </div>
   );

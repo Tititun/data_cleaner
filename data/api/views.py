@@ -18,14 +18,30 @@ def items_list(request):
     filters = Q()
     paginator = ItemPagination()
     source = request.GET.get('source')
+
     if source:
         filters &= Q(source__iregex=source)
+
     name = request.GET.get('name')
     if name:
         filters &= Q(name__iregex=name)
+
     category = request.GET.get('category')
     if category:
         filters &= Q(category__iregex=category)
+
+    level_1 = request.GET.get('level_1')
+    if level_1 and level_1 != 'null':
+        filters &= Q(level_1=level_1)
+
+    level_2 = request.GET.get('level_2')
+    if level_2 and level_2 != 'null':
+        filters &= Q(level_2=level_2)
+
+    level_3 = request.GET.get('level_3')
+    if level_3 and level_3 != 'null':
+        filters &= Q(level_3=level_3)
+
     items = Item.objects.filter(filters)
     result_page = paginator.paginate_queryset(items, request)
     data = ItemSerializer(result_page, many=True).data

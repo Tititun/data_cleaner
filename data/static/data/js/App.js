@@ -7,6 +7,7 @@ import Item from './components/item'
 import { Pagination } from './components/pagination';
 import { searchReducer } from './utils';
 import { headers, HOST } from './constants';
+import { Groups } from './components/groups';
 
 
 var levels;
@@ -24,6 +25,7 @@ function App() {
   })
   const [url, setUrl] = React.useState(`${HOST}/api/items`)
   const [items, setItems] = React.useState([])
+  const [groups, setGroups] = React.useState({})
 
 
   React.useEffect(() => {
@@ -53,6 +55,19 @@ function App() {
     .then(r => r.json())
     .then(data => {
       levels = data;
+    })
+    .catch(err => console.log(err))
+  }, [])
+
+  React.useEffect(() => {
+    fetch(`${HOST}/api/classified`, {
+      method: "GET",
+      headers: headers
+    })
+    .then(r => r.json())
+    .then(data => {
+      console.log(data)
+      setGroups(data);
     })
     .catch(err => console.log(err))
   }, [])
@@ -153,7 +168,7 @@ function App() {
         <Pagination {...pagination} onClickFunc={anchorRequest} />
         </div>
         
-        <div key={2} className='column is-3'></div>
+        <Groups key={3} groups={groups} />
       </div>
     </div>
   );

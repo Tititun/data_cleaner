@@ -27,6 +27,20 @@
   text-wrap: wrap;
 }
 
+.groups-columns {
+  max-width: 150px;
+}
+
+.groups-big-button {
+  text-wrap: wrap;
+  height: 100%;
+  min-width: 100%;
+}
+
+.groups-big-button:not(:last-child) {
+  margin-bottom: 0.5em;
+}
+
 table.is-loading {
   position: relative;
   pointer-events: none;

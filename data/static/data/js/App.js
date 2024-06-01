@@ -151,7 +151,7 @@ function App() {
         <div key={1} className='column is-9'>
           <nav className="navbar" role="navigation" aria-label="main navigation">
             <div className="navbar-brand">
-              <a role='button' className='delete' onClick={() =>{searchDispatcher({type: 'clear'}); setSelectedGroup([])}}></a>
+              <a role='button' className='delete is-align-self-center' onClick={() =>{searchDispatcher({type: 'clear'}); setSelectedGroup([])}}></a>
             </div>
             <div className="navbar-menu is-justify-content-center">
               <a role='button' className='navbar-item' onClick={() => setShowFilters(!showFilters)}>{showFilters ? 'Hide filters': 'Show filters'}</a>

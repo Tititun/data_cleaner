@@ -145,7 +145,7 @@ function App() {
   }
   
   return (
-    <div className="content m-5">
+    <div className="content mt-0 mx-3 mb-3">
        
       <div className='columns'>
         <div key={1} className='column is-9'>
@@ -208,8 +208,8 @@ function App() {
         <Pagination {...pagination} onClickFunc={anchorRequest} />
         </div>
         
-        <div key={3} className='column is-3'>
-          <div className='tabs is-fullwidth'>
+        <div key={3} id="right-main-column" className='column is-3'>
+          <div className='tabs main-tabs pb-5 is-fullwidth'>
             <ul>
               <li className={selectedTab === 'categorized' ? "is-active" : ''}>
                 <a onClick={() => setSelectedTab('categorized')}>Categorized</a>

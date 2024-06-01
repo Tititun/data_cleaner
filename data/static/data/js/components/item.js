@@ -95,7 +95,7 @@ export default function ({item, levels, updateItem, updateItems}) {
                                         level_3: item['level_3'] || ''})
     if (savedLevels === JSON.stringify(item_levels)) {
       if (item['level_1'] || item['level_2'] || item['level_3']) {
-        return 'has-background-success-light'}
+        return 'has-background-info-light'}
     } 
     return ''
   }  
@@ -119,7 +119,7 @@ export default function ({item, levels, updateItem, updateItems}) {
         </td>
         <td className='w-5'  key={8}>
           <div className='is-flex'>
-            <button className='button m-0 is-primary mr-1' onClick={() => saveItem(false)}>Save</button>
+            <button className='button m-0 has-background-primary-light mr-1' onClick={() => saveItem(false)}>Save</button>
             <button className='button is-light mr-1 has-background-danger-light' onClick={saveAllItems}>Save all</button>
             <button className='button is-danger mr-0' onClick={() => saveItem(true)}>X</button>
           </div>

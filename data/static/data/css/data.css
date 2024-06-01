@@ -49,13 +49,20 @@
   margin-bottom: 0.5em;
 }
 
-#categories_container {
-  max-height: 85vh;
+.main-tabs {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 2;
+}
+
+#right-main-column {
+  max-height: 90vh;
   overflow: scroll;
 }
 
 tr.has-background-success-light .level-cell:hover {
-  background-color: #00b89c;
+  background-color: rgba(0, 184, 156, 0.6352941176);
 }
 
 tr:not(.has-background-success-light) .level-cell:hover {

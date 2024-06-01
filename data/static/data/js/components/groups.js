@@ -1,22 +1,22 @@
 import React from 'react';
 
-export const Groups = function({key, groups, appSetFilters}) {
+export const Groups = function({groups, appSetFilters, hidden}) {
   const [selected, setSelected] = React.useState([])
 
   function clickHandler(level_1, level_2, level_3) {
     const args = [level_1, level_2, level_3]
 
     if (JSON.stringify(selected) === JSON.stringify(args)) {
-      level_1 = level_2 = level_3 = null
+      level_1 = level_2 = level_3 = ''
       setSelected([])
     } else {
       setSelected([level_1, level_2, level_3])
     }
 
     const values = {}
-    values['level_1'] = level_1 ? level_1 : null
-    values['level_2'] = level_2 ? level_2 : null
-    values['level_3'] = level_3 ? level_3 : null
+    values['level_1'] = (level_1 && level_1 !== 'NO GROUP') ? level_1 : ''
+    values['level_2'] = (level_2 && level_2 !== 'NO GROUP') ? level_2 : ''
+    values['level_3'] = (level_3 && level_3 !== 'NO GROUP') ? level_3 : ''
     appSetFilters({type: 'levels',
                    value: values})
   }
@@ -29,7 +29,7 @@ export const Groups = function({key, groups, appSetFilters}) {
   }
 
   return (
-      <div key={key} className='column is-3'>
+      <div className={hidden ? 'is-hidden' : ''}>
         {
           Object.entries(groups).map(([level_1, level_1_data]) => {
               return (

@@ -6,7 +6,7 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id', 'source', 'name', 'category',
-                  'level_1', 'level_2', 'level_3', 'translation',
+                  'level_1', 'level_2', 'level_3',
                   'level_1_inferred', 'level_2_inferred', 'level_3_inferred']
 
 

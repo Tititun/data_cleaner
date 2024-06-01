@@ -26,6 +26,7 @@ function App() {
   const [url, setUrl] = React.useState(`${HOST}/api/items`)
   const [items, setItems] = React.useState([])
   const [groups, setGroups] = React.useState({})
+  const [selectedTab, setSelectedTab] = React.useState('categorized')
 
 
   React.useEffect(() => {
@@ -110,13 +111,14 @@ function App() {
   
   return (
     <div className="content m-5">
-      <nav class="navbar is-justify-content-center" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-          <a role='button' className='navbar-item' onClick={() => setShowFilters(!showFilters)}>{showFilters ? 'Hide filters': 'Show filters'}</a>
-        </div>
-      </nav>  
+       
       <div className='columns'>
         <div key={1} className='column is-9'>
+          <nav class="navbar is-justify-content-center" role="navigation" aria-label="main navigation">
+          <div class="navbar-brand">
+            <a role='button' className='navbar-item' onClick={() => setShowFilters(!showFilters)}>{showFilters ? 'Hide filters': 'Show filters'}</a>
+          </div>
+        </nav>   
         <table className={`table is-striped is-hoverable ${isLoading ? 'is-loading' : ''}`}>
           <thead>
             {
@@ -130,9 +132,6 @@ function App() {
                 </th>
                 <th className="col-title" key={3}>
                   <input class="input" type="text" value={searchFilter['name']} onChange={e => searchDispatcher({type: 'name', value: e.target.value})}></input>
-                </th>
-                <th className="col-title" key={4}>
-                  <input class="input" type="text" value={searchFilter['translation']} onChange={e => searchDispatcher({type: 'translation', value: e.target.value})}></input>
                 </th>
                 <th className="col-title" key={5}>
                   <input class="input" type="text" value={searchFilter['level_1']} onChange={e => searchDispatcher({type: 'level_1', value: e.target.value})}></input>
@@ -148,14 +147,13 @@ function App() {
               : null
             }
             <tr>
-              <th className="col-title" key={1}>Source</th>
-              <th className="col-title" key={2}>Category</th>
-              <th className="col-title" key={3}>Name</th>
-              <th className="col-title" key={4}>Translation</th>
-              <th className="col-title" key={5}>level 1</th>
-              <th className="col-title" key={6}>level 2</th>
-              <th className="col-title" key={7}>level 3</th>
-              <th className="col-title" key={8}></th>
+              <th className="col-title has-text-centered" key={1}>Source</th>
+              <th className="col-title has-text-centered" key={2}>Category</th>
+              <th className="col-title has-text-centered" key={3}>Name</th>
+              <th className="col-title has-text-centered" key={5}>level 1</th>
+              <th className="col-title has-text-centered" key={6}>level 2</th>
+              <th className="col-title has-text-centered" key={7}>level 3</th>
+              <th className="col-title has-text-centered" key={8}></th>
             </tr>
           </thead>
           <tbody>
@@ -165,7 +163,22 @@ function App() {
         <Pagination {...pagination} onClickFunc={anchorRequest} />
         </div>
         
-        <Groups key={3} groups={groups} appSetFilters={searchDispatcher} />
+        <div key={3} className='column is-3'>
+          <div className='tabs'>
+            <ul className='is-justify-content-center'>
+              <li className={selectedTab === 'categorized' ? "is-active" : ''}>
+                <a onClick={() => setSelectedTab('categorized')}>Categorized</a>
+              </li>
+              <li className={selectedTab === 'categories_list' ? "is-active" : ''}>
+                <a onClick={() => setSelectedTab('categories_list')}>Categories list</a>
+              </li>
+            </ul>
+          </div>
+          <Groups groups={groups} appSetFilters={searchDispatcher} hidden={selectedTab === 'categorized' ? false : true}/>
+          <div className={selectedTab !== 'categories_list' ? 'is-hidden' : ''}>
+            <p>Hidden message</p>
+          </div>
+        </div>
       </div>
     </div>
   );

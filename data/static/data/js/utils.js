@@ -1,4 +1,6 @@
 /* eslint-disable default-case */
+import { headers } from "./constants"
+
 export const searchReducer = function(state, action) {
     switch (action.type) {
       case 'source':
@@ -16,4 +18,16 @@ export const searchReducer = function(state, action) {
       case 'levels':
         return {...state, ...action.value}  
     }
+}
+
+export function fetchAndSet(url, setter) {
+  fetch(url, {
+    method: "GET",
+    headers: headers
+  })
+  .then(r => r.json())
+  .then(data => {
+    setter(data);
+  })
+  .catch(err => console.log(err))
 }

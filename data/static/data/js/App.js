@@ -5,8 +5,9 @@ import React from 'react';
 import ReactDOM from 'react-dom'
 import Item from './components/item'
 import { Pagination } from './components/pagination';
-import { searchReducer } from './utils';
+import { fetchAndSet, searchReducer } from './utils';
 import { headers, HOST } from './constants';
+import { Categories } from './components/categories';
 import { Groups } from './components/groups';
 
 
@@ -26,6 +27,7 @@ function App() {
   const [url, setUrl] = React.useState(`${HOST}/api/items`)
   const [items, setItems] = React.useState([])
   const [groups, setGroups] = React.useState({})
+  const [categories, setCategories] = React.useState({})
   const [selectedTab, setSelectedTab] = React.useState('categorized')
 
 
@@ -61,15 +63,11 @@ function App() {
   }, [])
 
   React.useEffect(() => {
-    fetch(`${HOST}/api/classified`, {
-      method: "GET",
-      headers: headers
-    })
-    .then(r => r.json())
-    .then(data => {
-      setGroups(data);
-    })
-    .catch(err => console.log(err))
+    fetchAndSet(`${HOST}/api/classified`, setGroups)
+  }, [])
+
+  React.useEffect(() => {
+    fetchAndSet(`${HOST}/api/categories_list`, setCategories)
   }, [])
   
   React.useEffect(() => {
@@ -164,8 +162,8 @@ function App() {
         </div>
         
         <div key={3} className='column is-3'>
-          <div className='tabs'>
-            <ul className='is-justify-content-center'>
+          <div className='tabs is-fullwidth'>
+            <ul>
               <li className={selectedTab === 'categorized' ? "is-active" : ''}>
                 <a onClick={() => setSelectedTab('categorized')}>Categorized</a>
               </li>
@@ -175,9 +173,7 @@ function App() {
             </ul>
           </div>
           <Groups groups={groups} appSetFilters={searchDispatcher} hidden={selectedTab === 'categorized' ? false : true}/>
-          <div className={selectedTab !== 'categories_list' ? 'is-hidden' : ''}>
-            <p>Hidden message</p>
-          </div>
+          <Categories categories={categories} hidden={selectedTab !== 'categories_list' ? true : false} />
         </div>
       </div>
     </div>

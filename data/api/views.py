@@ -2,7 +2,7 @@ import json
 import traceback
 
 from django.db import connection
-from django.db.models import Q
+from django.db.models import Count, Q
 import pandas as pd
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -79,6 +79,21 @@ def levels(request):
     with open('data/levels.json') as f:
         levels = json.load(f)
     return Response(levels)
+
+
+@api_view(['GET'])
+def categories_list(request):
+    categories = {
+        cat['category']: cat['group_count']
+        for cat in (
+            Item.objects
+                .values('category')
+                .annotate(group_count=Count('id'))
+                .order_by('-group_count')
+                .values('category', 'group_count')
+        )
+    }
+    return Response(categories)
 
 
 @api_view(['GET'])

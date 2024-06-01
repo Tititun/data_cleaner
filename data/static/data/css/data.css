@@ -49,6 +49,11 @@
   margin-bottom: 0.5em;
 }
 
+#categories_container {
+  max-height: 85vh;
+  overflow: scroll;
+}
+
 table.is-loading {
   position: relative;
   pointer-events: none;

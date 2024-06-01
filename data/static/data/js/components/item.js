@@ -91,15 +91,15 @@ export default function ({item, levels, updateItem, updateItems}) {
         <td className='w-5' key={1}>{item.source}</td>
         <td className='w-10'  key={2}>{item.category}</td>
         <td className='w-35'  key={3}>{item.name}</td>
-        <td data-level={1} className='w-15 is-clickable' key={5} onClick={levelClicked}>
+        <td data-level={1} className='w-15 is-clickable level-cell' key={5} onClick={levelClicked}>
           {dropbar?.['1'] ? <Dropdown currentName={item_levels.level_1} nameList={dropbar['1']} level="level_1"
            removeDropbar={closeDropdown}/>: item_levels.level_1}
         </td>
-        <td data-level={2} className='w-15 has-text-centered is-clickable' key={6} onClick={levelClicked}>
+        <td data-level={2} className='w-15 has-text-centered is-clickable level-cell' key={6} onClick={levelClicked}>
           {dropbar?.['2'] ? <Dropdown currentName={item_levels.level_2} nameList={dropbar['2']} level="level_2"
            removeDropbar={closeDropdown}/>: item_levels.level_2}
         </td>
-        <td data-level={3} className='w-10 is-clickable' key={7} onClick={levelClicked}>
+        <td data-level={3} className='w-10 is-clickable level-cell' key={7} onClick={levelClicked}>
          {dropbar?.['3'] ? <Dropdown currentName={item_levels.level_3} nameList={dropbar['3']} level="level_3"
            removeDropbar={closeDropdown}/>: item_levels.level_3}
         </td>

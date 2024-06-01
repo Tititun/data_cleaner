@@ -54,6 +54,14 @@
   overflow: scroll;
 }
 
+tr.has-background-success-light .level-cell:hover {
+  background-color: #00b89c;
+}
+
+tr:not(.has-background-success-light) .level-cell:hover {
+  background-color: #dbdee0;
+}
+
 table.is-loading {
   position: relative;
   pointer-events: none;

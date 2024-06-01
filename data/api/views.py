@@ -17,10 +17,14 @@ from .serializers import ItemSerializer, ItemPostSerializer
 def items_list(request):
     filters = Q()
     paginator = ItemPagination()
-    source = request.GET.get('source')
 
+    source = request.GET.get('source')
     if source:
-        filters &= Q(source__iregex=source)
+        if len(source) < 3:
+            source = source.upper()
+        else:
+            source = source[:2].upper + source[2:].lower()
+        filters &= Q(source__startswith=source)
 
     name = request.GET.get('name')
     if name:
@@ -42,7 +46,17 @@ def items_list(request):
     if level_3 and level_3 != 'null':
         filters &= Q(level_3=level_3)
 
-    items = Item.objects.filter(filters)
+    show_classified = request.GET.get('show_classified')
+    show_classified = True if show_classified == 'true' else False
+
+    items = (
+        Item.objects
+            .filter(filters)
+            .exclude(
+                (Q(level_1__isnull=False) |
+                 Q(level_2__isnull=False) |
+                 Q(level_3__isnull=False)) if not show_classified else Q())
+    )
     result_page = paginator.paginate_queryset(items, request)
     data = ItemSerializer(result_page, many=True).data
     return paginator.get_paginated_response(data)
@@ -126,5 +140,4 @@ def classified(request):
     for gr_3, count_3 in level_3_.items():
         level_1, level_2, level_3 = gr_3
         groups[level_1]['groups'][level_2]['groups'][level_3] = count_3
-
     return Response(groups)

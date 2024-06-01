@@ -24,7 +24,9 @@ export const searchReducer = function(state, action) {
         for (const key of Object.keys(state)) {
           new_state[key] = ''
         }
-        return new_state   
+        return new_state
+      case 'show_classified':
+        return {...state, show_classified: action.value}   
     }
 }
 

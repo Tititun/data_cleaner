@@ -12,10 +12,43 @@ import { Categories } from './components/categories';
 import { Groups } from './components/groups';
 
 
-var levels;
+var levels = {};
+
+function update_or_create(word, level, relation) {
+  if (word === 'no group' || relation === 'no group') {
+    return
+  }
+  if (!(word in levels)) {
+    levels[word] = {}
+  }
+  if (!levels[word][level]) {
+    levels[word][level] = []
+  }
+  if (!levels[word][level].includes(relation)){
+    levels[word][level].push(relation)
+  }
+}
+
+function update_levels(groups) {
+  for (const [level_1, level_1_data] of Object.entries(groups)) {
+    const l1 = level_1.toLowerCase()
+    for (const [level_2, level_2_data] of Object.entries(level_1_data.groups)) {
+        const l2 = level_2.toLowerCase()
+        update_or_create(l1, 'l2', l2)
+        update_or_create(l2, 'l1', l1)
+        for (const level_3 of Object.keys(level_2_data.groups)) {
+          const l3 = level_3.toLowerCase()
+          update_or_create(l1, 'l3', l3)
+          update_or_create(l2, 'l3', l3)
+          update_or_create(l3, 'l1', l1)
+          update_or_create(l3, 'l2', l2)
+      }
+    }
+  }
+}
+
 
 function App() {
-  console.log('rendering table')
   const [showFilters, setShowFilters] = React.useState(false)
   const [isLoading, setIsLoading] = React.useState(false)
   const [pagination, setPagination] = React.useState({currentPage: 1, maxPage: null, prev: null, next: null})
@@ -74,6 +107,10 @@ function App() {
     }, 300)
     return () => clearTimeout(timeout)
   }, [searchFilter])
+
+  React.useEffect(() => {
+    update_levels(groups)
+  }, [groups])
   
   function anchorRequest (e) {
     e.preventDefault();
@@ -112,13 +149,20 @@ function App() {
        
       <div className='columns'>
         <div key={1} className='column is-9'>
-          <nav class="navbar" role="navigation" aria-label="main navigation">
-            <div class="navbar-brand">
+          <nav className="navbar" role="navigation" aria-label="main navigation">
+            <div className="navbar-brand">
               <a role='button' className='delete' onClick={() =>{searchDispatcher({type: 'clear'}); setSelectedGroup([])}}></a>
             </div>
-            <div class="navbar-menu is-justify-content-center">
+            <div className="navbar-menu is-justify-content-center">
               <a role='button' className='navbar-item' onClick={() => setShowFilters(!showFilters)}>{showFilters ? 'Hide filters': 'Show filters'}</a>
             </div>
+            <a className="navbar-item">
+              <label className="checkbox">
+              <input type="checkbox" className=' mr-2' onClick={() => searchDispatcher({type: 'show_classified', value: !(searchFilter['show_classified'])})}
+               checked={searchFilter['show_classified']} />
+                Show classified
+              </label>
+            </a>
           </nav>   
         <table className={`table is-striped is-hoverable ${isLoading ? 'is-loading' : ''}`}>
           <thead>

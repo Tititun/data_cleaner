@@ -6,7 +6,6 @@ import { SaveModal } from './save_modal';
 
 
 export default function ({item, levels, updateItem, updateItems}) {
-  console.log('rendering item')
   const [dropbar, setDropbar] = React.useState({})
   const [item_levels, setItemLevels] = React.useState({level_1: '', level_2: '', level_3: ''})
   const [modalUpdateData, setModalUpdateData] = React.useState({})
@@ -46,13 +45,24 @@ export default function ({item, levels, updateItem, updateItems}) {
     setDropbar(null)
   }
 
-  function saveItem() {
-    const update_data = {
-      id: item['id'],
-      level_1: item_levels['level_1'] || item['level_1_inferred'],
-      level_2: item_levels['level_2'] || item['level_2_inferred'],
-      level_3: item_levels['level_3'] || item['level_3_inferred'],
+  function saveItem(remove_levels=false) {
+    let update_data;
+    if (remove_levels) {
+      update_data = {
+        id: item['id'],
+        level_1: null,
+        level_2: null,
+        level_3: null,
+      }
+    } else {
+      update_data = {
+        id: item['id'],
+        level_1: item_levels['level_1'] || item['level_1_inferred'],
+        level_2: item_levels['level_2'] || item['level_2_inferred'],
+        level_3: item_levels['level_3'] || item['level_3_inferred'],
+      }
     }
+
     const body = JSON.stringify(update_data)
     fetch(`${HOST}/api/set_item_levels`, {
       method: "POST",
@@ -96,21 +106,22 @@ export default function ({item, levels, updateItem, updateItems}) {
         <td className='w-10'  key={2}>{item.category}</td>
         <td className='w-35'  key={3}>{item.name}</td>
         <td data-level={1} className='w-15 has-text-centered is-clickable level-cell' key={5} onClick={levelClicked}>
-          {dropbar?.['1'] ? <Dropdown currentName={item_levels.level_1} nameList={dropbar['1']} level="level_1"
+          {dropbar?.['1'] ? <Dropdown currentName={item_levels.level_1} nameList={dropbar['1']} fullNameList={Object.keys(levels)} level="level_1"
            removeDropbar={closeDropdown}/>: item_levels.level_1}
         </td>
         <td data-level={2} className='w-15 has-text-centered is-clickable level-cell' key={6} onClick={levelClicked}>
-          {dropbar?.['2'] ? <Dropdown currentName={item_levels.level_2} nameList={dropbar['2']} level="level_2"
+          {dropbar?.['2'] ? <Dropdown currentName={item_levels.level_2} nameList={dropbar['2']} fullNameList={Object.keys(levels)} level="level_2"
            removeDropbar={closeDropdown}/>: item_levels.level_2}
         </td>
         <td data-level={3} className='w-10 has-text-centered is-clickable level-cell' key={7} onClick={levelClicked}>
-         {dropbar?.['3'] ? <Dropdown currentName={item_levels.level_3} nameList={dropbar['3']} level="level_3"
+         {dropbar?.['3'] ? <Dropdown currentName={item_levels.level_3} nameList={dropbar['3']} fullNameList={Object.keys(levels)} level="level_3"
            removeDropbar={closeDropdown}/>: item_levels.level_3}
         </td>
         <td className='w-5'  key={8}>
           <div className='is-flex'>
-            <button className='button is-light m-0 is-primary mr-1' onClick={saveItem}>Save</button>
-            <button className='button is-light m-0 has-background-danger-light' onClick={saveAllItems}>Save all</button>
+            <button className='button m-0 is-primary mr-1' onClick={() => saveItem(false)}>Save</button>
+            <button className='button is-light mr-1 has-background-danger-light' onClick={saveAllItems}>Save all</button>
+            <button className='button is-danger mr-0' onClick={() => saveItem(true)}>X</button>
           </div>
         </td> 
       <SaveModal active={isModalActive} setIsModalActive={setIsModalActive} updateData={modalUpdateData} updateItems={updateItems} />  

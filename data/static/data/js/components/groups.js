@@ -21,11 +21,30 @@ export const Groups = function({groups, appSetFilters, selectedGroup, setSelecte
                    value: values})
   }
 
-  function pickClass(level_1, level_2, level_3) {
+  function pickColors(level_1, level_2, level_3) {
     if (level_1 === selectedGroup[0] && level_2 === selectedGroup[1] && level_3 === selectedGroup[2]) {
-      return 'is-danger'
+      return ['#ff6685', '#ffccd6']
     }
-    return 'is-info'
+    return  ['#66d1ff', '#ccf0ff']
+  }
+
+  const group_size = {}
+  for (const [level_1, level_1_data] of Object.entries(groups)) {
+    group_size[level_1] = 0;
+    for (const [level_2, level_2_data] of Object.entries(level_1_data.groups)) {
+        group_size[level_2] = 0;
+        for (const level_3 of Object.keys(level_2_data.groups)) {
+          group_size[level_1] += 1
+          group_size[level_2] += 1
+          group_size[level_3] = 1
+        }
+    }
+  }
+   
+  function calc_gradient(level, count, color_1, color_2) {
+    
+    const threshold = Math.ceil(100 * count / (group_size[level] * 1000))
+    return `linear-gradient(to right, ${color_1}  0% ${threshold}%, ${color_2} ${threshold}% 100%)`
   }
 
   return (
@@ -37,7 +56,8 @@ export const Groups = function({groups, appSetFilters, selectedGroup, setSelecte
                 
                 <div className="column col-4 is-flex groups-columns">
                   <button
-                   className={"button ml-1 groups-big-button " + pickClass(level_1)}
+                   className="button ml-1 groups-big-button"
+                   style={{backgroundImage: calc_gradient(level_1, level_1_data.count, ...pickColors(level_1))}}
                    disabled = {level_1 === 'NO GROUP' ? true : false}
                    onClick={() => clickHandler(level_1)}>{level_1}</button>
                 </div>
@@ -50,17 +70,19 @@ export const Groups = function({groups, appSetFilters, selectedGroup, setSelecte
                           
                           <div className="column col-6 groups-columns is-flex is-flex-direction-column">
                             <button
-                             className={"button groups-big-button " + pickClass(level_1, level_2)}
+                             className={"button groups-big-button "}
+                             style={{backgroundImage: calc_gradient(level_2, level_2_data.count, ...pickColors(level_1, level_2))}}
                              disabled = {level_2 === 'NO GROUP' ? true : false}
                              onClick={() => clickHandler(level_1, level_2)}>{level_2}</button>
                           </div>
 
                           <div className="column col-6 groups-columns is-flex is-flex-direction-column">
                             {
-                              Object.keys(level_2_data.groups).map(level_3 => {
+                              Object.entries(level_2_data.groups).map(([level_3, level_3_count]) => {
                                 return (
                                   <button
-                                   className={"button groups-big-button " + pickClass(level_1, level_2, level_3)}
+                                   className={"button groups-big-button "}
+                                   style={{backgroundImage: calc_gradient(level_3, level_3_count, ...pickColors(level_1, level_2, level_3))}}
                                    disabled = {level_3 === 'NO GROUP' ? true : false}
                                    onClick={() => clickHandler(level_1, level_2, level_3)}>{level_3}</button>
                                 )

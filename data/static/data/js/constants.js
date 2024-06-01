@@ -7,5 +7,5 @@ export const headers = { "Content-Type": "application/json",
                 }
 
 export const empty_filters = {
-    source: '', category: '', name: '', translation: '', level_1: '', level_2: '', level_3: ''
+    source: '', category: '', name: '', translation: '', level_1: '', level_2: '', level_3: '', show_classified: true
   }

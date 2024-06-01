@@ -1,3 +1,4 @@
+import math
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
@@ -11,6 +12,6 @@ class ItemPagination(PageNumberPagination):
             'previous': self.get_previous_link(),
             'count': self.page.paginator.count,
             'results': data,
-            'max_page': round(self.page.paginator.count / self.page_size) + 1,
+            'max_page': math.ceil(self.page.paginator.count / self.page_size),
             'page_number': self.page.number
         })

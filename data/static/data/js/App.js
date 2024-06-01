@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-has-content */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable no-unused-vars */
@@ -6,7 +7,7 @@ import ReactDOM from 'react-dom'
 import Item from './components/item'
 import { Pagination } from './components/pagination';
 import { fetchAndSet, searchReducer } from './utils';
-import { headers, HOST } from './constants';
+import { empty_filters, headers, HOST } from './constants';
 import { Categories } from './components/categories';
 import { Groups } from './components/groups';
 
@@ -15,18 +16,15 @@ var levels;
 
 function App() {
   console.log('rendering table')
-
-  const [displayIds, setDisplayIds] = React.useState([])
   const [showFilters, setShowFilters] = React.useState(false)
   const [isLoading, setIsLoading] = React.useState(false)
   const [pagination, setPagination] = React.useState({currentPage: 1, maxPage: null, prev: null, next: null})
   
-  const [searchFilter, searchDispatcher] = React.useReducer(searchReducer, {
-    source: '', category: '', name: '', translation: '', level_1: '', level_2: '', level_3: ''
-  })
+  const [searchFilter, searchDispatcher] = React.useReducer(searchReducer, empty_filters)
   const [url, setUrl] = React.useState(`${HOST}/api/items`)
   const [items, setItems] = React.useState([])
   const [groups, setGroups] = React.useState({})
+  const [selectedGroup, setSelectedGroup] = React.useState([])
   const [categories, setCategories] = React.useState({})
   const [selectedTab, setSelectedTab] = React.useState('categorized')
 
@@ -114,11 +112,14 @@ function App() {
        
       <div className='columns'>
         <div key={1} className='column is-9'>
-          <nav class="navbar is-justify-content-center" role="navigation" aria-label="main navigation">
-          <div class="navbar-brand">
-            <a role='button' className='navbar-item' onClick={() => setShowFilters(!showFilters)}>{showFilters ? 'Hide filters': 'Show filters'}</a>
-          </div>
-        </nav>   
+          <nav class="navbar" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+              <a role='button' className='delete' onClick={() =>{searchDispatcher({type: 'clear'}); setSelectedGroup([])}}></a>
+            </div>
+            <div class="navbar-menu is-justify-content-center">
+              <a role='button' className='navbar-item' onClick={() => setShowFilters(!showFilters)}>{showFilters ? 'Hide filters': 'Show filters'}</a>
+            </div>
+          </nav>   
         <table className={`table is-striped is-hoverable ${isLoading ? 'is-loading' : ''}`}>
           <thead>
             {
@@ -174,7 +175,8 @@ function App() {
               </li>
             </ul>
           </div>
-          <Groups groups={groups} appSetFilters={searchDispatcher} hidden={selectedTab === 'categorized' ? false : true}/>
+          <Groups groups={groups} appSetFilters={searchDispatcher} selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup}
+           hidden={selectedTab === 'categorized' ? false : true}/>
           <Categories categories={categories} appSetFilters={searchDispatcher} appFilters={searchFilter}
            hidden={selectedTab !== 'categories_list' ? true : false} />
         </div>

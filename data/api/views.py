@@ -28,7 +28,7 @@ def items_list(request):
 
     category = request.GET.get('category')
     if category:
-        filters &= Q(category__iregex=category)
+        filters &= Q(category=category)
 
     level_1 = request.GET.get('level_1')
     if level_1 and level_1 != 'null':
@@ -61,15 +61,21 @@ def set_item_levels(request):
 @api_view(['POST'])
 def set_items_levels(request):
     data = request.data
+    ignore_classified = data['ignore_classified']
     try:
-        (Item.objects
+        updated = (Item.objects
              .filter(category=data['category'], source=data['source'])
+             .exclude(
+            (Q(level_1__isnull=False) |
+             Q(level_2__isnull=False) |
+             Q(level_3__isnull=False)) if ignore_classified else Q())
              .update(
                 level_1=data['level_1'],
                 level_2=data['level_2'],
                 level_3=data['level_3']
         ))
-        return Response({"status": "success"})
+        print('updated:', updated)
+        return Response({"status": "success" if updated else "fail"})
     except:
         return Response({"status": "fail"}, status=status.HTTP_400_BAD_REQUEST)
 

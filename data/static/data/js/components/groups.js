@@ -1,16 +1,15 @@
 import React from 'react';
 
-export const Groups = function({groups, appSetFilters, hidden}) {
-  const [selected, setSelected] = React.useState([])
-
+export const Groups = function({groups, appSetFilters, selectedGroup, setSelectedGroup, hidden}) {
+  
   function clickHandler(level_1, level_2, level_3) {
     const args = [level_1, level_2, level_3]
 
-    if (JSON.stringify(selected) === JSON.stringify(args)) {
+    if (JSON.stringify(selectedGroup) === JSON.stringify(args)) {
       level_1 = level_2 = level_3 = ''
-      setSelected([])
+      setSelectedGroup([])
     } else {
-      setSelected([level_1, level_2, level_3])
+      setSelectedGroup([level_1, level_2, level_3])
     }
 
     const values = {}
@@ -23,7 +22,7 @@ export const Groups = function({groups, appSetFilters, hidden}) {
   }
 
   function pickClass(level_1, level_2, level_3) {
-    if (level_1 === selected[0] && level_2 === selected[1] && level_3 === selected[2]) {
+    if (level_1 === selectedGroup[0] && level_2 === selectedGroup[1] && level_3 === selectedGroup[2]) {
       return 'is-danger'
     }
     return 'is-info'

@@ -18,7 +18,13 @@ export const searchReducer = function(state, action) {
       case 'levels':
         return {...state, ...action.value}  
       case 'categories_list':
-        return {...state, ...action.value}   
+        return {...state, ...action.value}  
+      case 'clear':
+        const new_state = {};
+        for (const key of Object.keys(state)) {
+          new_state[key] = ''
+        }
+        return new_state   
     }
 }
 

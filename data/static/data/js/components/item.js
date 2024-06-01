@@ -2,12 +2,15 @@
 import React from 'react';
 import { Dropdown } from './dropdown';
 import { HOST, headers } from '../constants';
+import { SaveModal } from './save_modal';
+
 
 export default function ({item, levels, updateItem, updateItems}) {
   console.log('rendering item')
   const [dropbar, setDropbar] = React.useState({})
   const [item_levels, setItemLevels] = React.useState({level_1: '', level_2: '', level_3: ''})
-  // const [classified, setClassified] = React.useState(item['level_1'] || item['level_2'])
+  const [modalUpdateData, setModalUpdateData] = React.useState({})
+  const [isModalActive, setIsModalActive] = React.useState(false)
 
   React.useEffect(() => {
     setItemLevels({
@@ -72,19 +75,9 @@ export default function ({item, levels, updateItem, updateItems}) {
       level_2: item_levels['level_2'] || item['level_2_inferred'],
       level_3: item_levels['level_3'] || item['level_3_inferred'],
     }
-    const body = JSON.stringify(update_data)
-    fetch(`${HOST}/api/set_items_levels`, {
-      method: "POST",
-      headers: headers,
-      body: body}
-      ).then(r => r.json())
-      .then(data => {
-          if (data['status'] === 'success') {
-            updateItems(update_data)
-          }
-        })
-      .catch(err => console.log(err))
-    }
+    setModalUpdateData(update_data)
+    setIsModalActive(true)
+  }
 
   function getBackgroundColor() {
     const savedLevels = JSON.stringify({level_1: item['level_1'] || '',
@@ -120,6 +113,7 @@ export default function ({item, levels, updateItem, updateItems}) {
             <button className='button is-light m-0 has-background-danger-light' onClick={saveAllItems}>Save all</button>
           </div>
         </td> 
+      <SaveModal active={isModalActive} setIsModalActive={setIsModalActive} updateData={modalUpdateData} updateItems={updateItems} />  
       </tr>
   )
 }

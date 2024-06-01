@@ -13,7 +13,7 @@ export const Dropdown = function ({currentName, nameList, removeDropbar, level})
 
     return (
         <div ref={ref} className="dropdown is-hoverable is-active" onMouseLeave={() => closeDropdown(currentName)}>
-            <input className="input" type="text" onChange={e => setFilter(e.target.value)} onKeyUp={ e => {
+            <input autoFocus className="input" type="text" onChange={e => setFilter(e.target.value)} onKeyUp={ e => {
                                                                                             if (e.key === 'Enter') { closeDropdown(e.target.value) }
                                                                                         }}> 
                 

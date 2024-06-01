@@ -76,23 +76,25 @@ def set_items_levels(request):
 
 @api_view(['GET'])
 def levels(request):
-    with open('data/levels.json') as f:
+    with open('data/api/json/levels.json') as f:
         levels = json.load(f)
     return Response(levels)
 
 
 @api_view(['GET'])
 def categories_list(request):
-    categories = {
-        cat['category']: cat['group_count']
-        for cat in (
-            Item.objects
-                .values('category')
-                .annotate(group_count=Count('id'))
-                .order_by('-group_count')
-                .values('category', 'group_count')
-        )
-    }
+    # categories = {
+    #     cat['category']: cat['group_count']
+    #     for cat in (
+    #         Item.objects
+    #             .values('category')
+    #             .annotate(group_count=Count('id'))
+    #             .order_by('-group_count')
+    #             .values('category', 'group_count')
+    #     )
+    # }
+    with open('data/api/json/categories.json') as f:
+        categories = json.load(f)
     return Response(categories)
 
 

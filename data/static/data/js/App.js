@@ -173,7 +173,8 @@ function App() {
             </ul>
           </div>
           <Groups groups={groups} appSetFilters={searchDispatcher} hidden={selectedTab === 'categorized' ? false : true}/>
-          <Categories categories={categories} hidden={selectedTab !== 'categories_list' ? true : false} />
+          <Categories categories={categories} appSetFilters={searchDispatcher} appFilters={searchFilter}
+           hidden={selectedTab !== 'categories_list' ? true : false} />
         </div>
       </div>
     </div>

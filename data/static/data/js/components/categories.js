@@ -1,14 +1,26 @@
 import React from 'react';
 
 var timer;
-export const Categories = function({categories, hidden}) {
+export const Categories = function({categories, hidden, appSetFilters, appFilters}) {
     const [search, setSearch] = React.useState('')
     const [filter, setFilter] = React.useState('')
+    const [selected, setSelected] = React.useState(appFilters['category'])
 
     function searchHandler(value) {
       clearTimeout(timer)
       setSearch(value);
       timer = setTimeout(() => setFilter(value), 400)
+    }
+
+    function rowClickHandler(category) {
+      if (selected === category) {
+        setSelected('');
+        category = '';
+      }
+      setSelected(category)
+      appSetFilters({type: 'categories_list',
+                     value: {category: category}
+                    })
     }
 
     return (
@@ -31,7 +43,10 @@ export const Categories = function({categories, hidden}) {
               Object.entries(categories).map(([category, count], idx) => {
                 return (
                   category.search(filter) !== -1 ?
-                  <tr>
+                  <tr
+                   onClick={() => rowClickHandler(category)}
+                   className={`is-clickable ${selected === category ? 'has-background-info-light' : ''}`}
+                   >
                     <td>{category}</td>
                     <td>{count}</td>
                   </tr> : null

@@ -17,6 +17,7 @@ export const Groups = function({groups, appSetFilters, hidden}) {
     values['level_1'] = (level_1 && level_1 !== 'NO GROUP') ? level_1 : ''
     values['level_2'] = (level_2 && level_2 !== 'NO GROUP') ? level_2 : ''
     values['level_3'] = (level_3 && level_3 !== 'NO GROUP') ? level_3 : ''
+    values['category'] = ''
     appSetFilters({type: 'levels',
                    value: values})
   }

@@ -6,6 +6,10 @@ export const Categories = function({categories, hidden, appSetFilters, appFilter
     const [filter, setFilter] = React.useState('')
     const [selected, setSelected] = React.useState(appFilters['category'])
 
+    React.useEffect(() => {
+      setSelected(appFilters['category'])
+    }, [appFilters])
+
     function searchHandler(value) {
       clearTimeout(timer)
       setSearch(value);

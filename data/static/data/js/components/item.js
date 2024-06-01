@@ -86,8 +86,19 @@ export default function ({item, levels, updateItem, updateItems}) {
       .catch(err => console.log(err))
     }
 
+  function getBackgroundColor() {
+    const savedLevels = JSON.stringify({level_1: item['level_1'] || '',
+                                        level_2: item['level_2'] || '',
+                                        level_3: item['level_3'] || ''})
+    if (savedLevels === JSON.stringify(item_levels)) {
+      if (item['level_1'] || item['level_2'] || item['level_3']) {
+        return 'has-background-success-light'}
+    } 
+    return ''
+  }  
+
   return (
-      <tr key={item.id} className={`${item['level_1'] || item['level_2'] ? 'has-background-success-light' : ""}`}>
+      <tr key={item.id} className={getBackgroundColor()}>
         <td className='w-5' key={1}>{item.source}</td>
         <td className='w-10'  key={2}>{item.category}</td>
         <td className='w-35'  key={3}>{item.name}</td>

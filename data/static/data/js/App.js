@@ -93,6 +93,7 @@ function App() {
       }
     }
     setItems(new_items)
+    fetchAndSet(`${HOST}/api/classified`, setGroups)
   }
 
   function updateItems(new_data) {
@@ -105,6 +106,7 @@ function App() {
       }
     }
     setItems(new_items)
+    fetchAndSet(`${HOST}/api/classified`, setGroups)
   }
   
   return (

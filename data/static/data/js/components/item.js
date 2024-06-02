@@ -55,7 +55,7 @@ export default function ({item, levels, updateItem, updateItems, brush}) {
   }
 
   function closeDropdown(value, level) {
-    if (value){
+    if (value || value === ''){
       setItemLevels(structuredClone({...item_levels, [level]: value}))
     }
     setDropbar(null)

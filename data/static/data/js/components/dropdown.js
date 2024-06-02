@@ -3,7 +3,7 @@ import React from 'react';
 
 export const Dropdown = function ({currentName, nameList, fullNameList, removeDropbar, level}) {
     const ref = React.useRef(null)
-    const [filter, setFilter] = React.useState('')
+    const [filter, setFilter] = React.useState(currentName)
 
     function closeDropdown (value) {
         ref.current &&  ref.current.classList.remove('is-active')
@@ -30,7 +30,7 @@ export const Dropdown = function ({currentName, nameList, fullNameList, removeDr
 
     return (
         <div ref={ref} className="dropdown is-hoverable is-active" onMouseLeave={() => closeDropdown(currentName)}>
-            <input autoFocus className="input" type="text" onChange={e => setFilter(e.target.value)} onKeyUp={ e => {
+            <input autoFocus value={filter} className="input" type="text" onChange={e => setFilter(e.target.value)} onKeyUp={ e => {
                                                                                             if (e.key === 'Enter') { closeDropdown(e.target.value) }
                                                                                         }}> 
                 

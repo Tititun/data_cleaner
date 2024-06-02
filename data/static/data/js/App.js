@@ -197,7 +197,7 @@ function App() {
     <div className="content mt-0 mx-3 mb-3">
        
       <div className='columns'>
-        <div key={1} className='column is-9'>
+        <div key={1} id='left-main-column' className='column is-9'>
           <nav className="navbar" role="navigation" aria-label="main navigation">
             <div className="navbar-brand">
               <a role='button' className='delete is-align-self-center' onClick={() =>{searchDispatcher({type: 'clear'}); setSelectedGroup([])}}></a>
@@ -218,7 +218,7 @@ function App() {
               </label>
             </a>
           </nav>   
-        <table className={`table is-striped is-hoverable ${isLoading ? 'is-loading' : ''}`}>
+        <table id="main-table" className={`table is-striped is-hoverable ${isLoading ? 'is-loading' : ''}`}>
           <thead>
             {
               showFilters ?

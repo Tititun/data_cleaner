@@ -56,9 +56,16 @@
   z-index: 2;
 }
 
-#right-main-column {
+#left-main-column {
   height: 100vh;
   overflow: scroll;
+  position: sticky;
+  padding-bottom: 0;
+}
+
+#right-main-column {
+  height: 100vh;
+  overflow: hidden;
   position: sticky;
   top: 0;
   padding-top: 0;
@@ -93,7 +100,7 @@ nav.pagination {
   background-color: white;
 }
 
-thead tr {
+#main-table thead tr {
   height: 55px;
   background-color: white;
   position: sticky;
@@ -101,14 +108,24 @@ thead tr {
   z-index: 2;
 }
 
-thead tr:last-child {
+#main-table thead tr:last-child {
   height: 55;
   position: sticky;
   top: 110px;
 }
 
-thead tr.hoisted {
+#main-table thead tr.hoisted {
   top: 55px;
+}
+
+#categories_container {
+  height: 100vh;
+  overflow: scroll;
+}
+
+#categories_container input {
+  position: sticky;
+  top: 0;
 }
 
 table.is-loading {

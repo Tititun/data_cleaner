@@ -123,6 +123,11 @@ nav.pagination {
   overflow: scroll;
 }
 
+#groups-container {
+  height: 100%;
+  overflow: scroll;
+}
+
 #categories_container input {
   position: sticky;
   top: 0;

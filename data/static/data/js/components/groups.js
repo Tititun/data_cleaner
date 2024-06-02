@@ -58,7 +58,7 @@ export const Groups = function({groups, appSetFilters, selectedGroup, setSelecte
   }
 
   return (
-      <div className={`${hidden ? 'is-hidden' : ''}`}>
+      <div id="groups-container" className={`${hidden ? 'is-hidden' : ''}`}>
         {
           Object.entries(groups).map(([level_1, level_1_data]) => {
               return (

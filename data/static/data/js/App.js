@@ -61,6 +61,7 @@ function App() {
   const [categories, setCategories] = React.useState({})
   const [selectedTab, setSelectedTab] = React.useState('categorized')
   const [brush, setBrush] = React.useState(null)
+  const [temp, setTemp] = React.useState({})
 
 
   React.useEffect(() => {
@@ -72,9 +73,17 @@ function App() {
       .then(r => r.json())
       .then(data => {
         if (!didCancel) {
-          setItems(data['results']);
-          setPagination({currentPage: data['page_number'], maxPage: data['max_page'], prev: data['previous'], next: data['next']})
-          setIsLoading(false)
+          if (data["detail"] === "Invalid page.") {
+            console.log('INVALID PAGE')
+            setTemp({})
+            searchDispatcher({type: 'clear'})
+            setIsLoading(false)
+          } else {
+            setItems(data['results']);
+            setTemp({})
+            setPagination({currentPage: data['page_number'], maxPage: data['max_page'], prev: data['previous'], next: data['next']})
+            setIsLoading(false)
+          }
         }
       })
       .catch(err => console.log(err))
@@ -121,33 +130,61 @@ function App() {
 
   function updateItem(new_item) {
     const new_items = []
+    const new_temp = structuredClone(temp)
     for (let old_item of items) {
       if (old_item['id'] === new_item['id']) {
         new_items.push({...old_item, ...new_item})
+        delete new_temp[old_item['id']]
       } else {
         new_items.push(old_item)
       }
     }
     setItems(new_items)
+    setTemp(new_temp)
     fetchAndSet(`${HOST}/api/classified`, setGroups)
   }
 
   function updateItems(new_data) {
     const new_items = []
+    const new_temp = structuredClone(temp)
     for (let old_item of items) {
       if (old_item['category'] === new_data['category']) {
         new_items.push({...old_item, ...new_data})
+        delete new_temp[old_item['id']]
       } else {
         new_items.push(old_item)
       }
     }
     setItems(new_items)
+    setTemp(new_temp)
     fetchAndSet(`${HOST}/api/classified`, setGroups)
   }
 
   function savePage() {
-  }
-
+    const body = JSON.stringify(temp)
+    fetch(`${HOST}/api/save_page`, {
+      method: "POST",
+      headers: headers,
+      body: body}
+     ).then(r => r.json())
+      .then(data => {
+          if (data['status'] === 'success') {
+            const new_items = []
+            for (let old_item of items) {
+              if (old_item['id'] in temp ) {
+                new_items.push(temp[old_item.id])
+              } else {
+                new_items.push(old_item)
+              }
+            }
+            setItems(new_items)
+            setTemp({})
+            fetchAndSet(`${HOST}/api/classified`, setGroups)
+          }
+        })
+      .catch(err => console.log(err))
+    }
+    
   function palletteClick() {
     if (brush) {
       setBrush(null)
@@ -219,14 +256,16 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {items && levels && items.map(item => <Item item={item} levels={levels} updateItem={updateItem} updateItems={updateItems} brush={brush} />)}
+            {items && levels && items.map(item => 
+            <Item item={item} levels={levels} updateItem={updateItem}
+             updateItems={updateItems} brush={brush} setTemp={setTemp} />)}
           </tbody>
         </table>  
         <Pagination {...pagination} onClickFunc={anchorRequest} />
         </div>
         
         <div key={3} id="right-main-column" className='column is-3'>
-          <div className='tabs main-tabs pb-5 is-fullwidth'>
+          <div className='tabs main-tabs is-fullwidth'>
             <ul>
               <li className={selectedTab === 'categorized' ? "is-active" : ''}>
                 <a onClick={() => setSelectedTab('categorized')}>Categorized</a>

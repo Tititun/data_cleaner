@@ -32,7 +32,7 @@ def items_list(request):
 
     category = request.GET.get('category')
     if category:
-        filters &= Q(category=category)
+        filters &= Q(category__iregex=category)
 
     level_1 = request.GET.get('level_1')
     if level_1 and level_1 != 'null':
@@ -74,6 +74,32 @@ def set_item_levels(request):
         return Response({"status": "success"})
     print(serializer.errors)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def save_page(request):
+    data = request.data
+
+    for item_id, details in data.items():
+        for level, value in details.items():
+            if not value:
+                details[level] = None
+    print(data)
+    try:
+        items = Item.objects.filter(id__in=data.keys())
+        for item in items:
+            print(item)
+            item.level_1 = data[str(item.id)]['level_1']
+            item.level_2 = data[str(item.id)]['level_2']
+            item.level_3 = data[str(item.id)]['level_3']
+            item.save()
+        # updated = Item.objects.bulk_update(items,
+        #                                    ['level_1', 'level_2', 'level_3'])
+
+        return Response({"status": "success"})
+    except:
+        print(traceback.format_exc())
+        return Response({"status": "fail"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])

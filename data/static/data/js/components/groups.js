@@ -53,7 +53,7 @@ export const Groups = function({groups, appSetFilters, selectedGroup, setSelecte
    
   function calc_gradient(level, count, color_1, color_2) {
     
-    const threshold = Math.ceil(100 * count / (group_size[level] * 1000))
+    const threshold = Math.ceil(100 * count / (group_size[level] * 500))
     return `linear-gradient(to right, ${color_1}  0% ${threshold}%, ${color_2} ${threshold}% 100%)`
   }
 

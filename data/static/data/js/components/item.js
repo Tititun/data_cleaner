@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable import/no-anonymous-default-export */
 import React from 'react';
 import { Dropdown } from './dropdown';
@@ -5,7 +6,7 @@ import { HOST, headers } from '../constants';
 import { SaveModal } from './save_modal';
 
 
-export default function ({item, levels, updateItem, updateItems, brush}) {
+export default function ({item, levels, updateItem, updateItems, brush, setTemp}) {
   const [dropbar, setDropbar] = React.useState({})
   const [item_levels, setItemLevels] = React.useState({level_1: '', level_2: '', level_3: ''})
   const [modalUpdateData, setModalUpdateData] = React.useState({})
@@ -30,6 +31,15 @@ export default function ({item, levels, updateItem, updateItems, brush}) {
       }
     }
     setUncommitted(flag)
+    if (flag) {
+      setTemp(prev => ({...prev, [item.id]: {...item, ...item_levels}}))
+    } else {
+      setTemp(prev => {
+        let new_state = structuredClone(prev)
+        delete new_state[item.id]
+        return new_state
+      })
+    }
   }, [item_levels])
 
   function levelClicked(e) {

@@ -245,14 +245,15 @@ function App() {
               </tr>
               : null
             }
-            <tr>
+            <tr className={`${showFilters ? '' : 'hoisted'}`}>
               <th className="col-title has-text-centered" key={1}>Source</th>
               <th className="col-title has-text-centered" key={2}>Category</th>
               <th className="col-title has-text-centered" key={3}>Name</th>
               <th className="col-title has-text-centered" key={5}>level 1</th>
               <th className="col-title has-text-centered" key={6}>level 2</th>
               <th className="col-title has-text-centered" key={7}>level 3</th>
-              <th className="col-title has-text-centered" key={8}><button className='button is-light' onClick={savePage}>Save page</button></th>
+              <th className="col-title has-text-centered" key={8}>
+                <button className='button is-light' onClick={savePage}>Save page{Object.keys(temp).length ? ` [${Object.keys(temp).length}]` : ''}</button></th>
             </tr>
           </thead>
           <tbody>

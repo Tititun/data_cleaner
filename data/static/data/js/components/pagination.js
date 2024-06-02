@@ -24,7 +24,7 @@ export const Pagination = function({currentPage, maxPage, prev, next, onClickFun
     }
 
     return (
-        <nav className="pagination" role="navigation" aria-label="pagination">
+        <nav className="pagination pb-2" role="navigation" aria-label="pagination">
             <a href={prev} className="pagination-previous" disabled={prev ? false : true} onClick={onClickFunc}>Previous</a>
             <a href={next} className="pagination-next" disabled={next ? false : true} onClick={onClickFunc}>Next page</a>
             <ul class="pagination-list">

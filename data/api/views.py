@@ -65,10 +65,14 @@ def items_list(request):
 @api_view(['POST'])
 def set_item_levels(request):
     item = Item.objects.get(id=request.data['id'])
-    serializer = ItemPostSerializer(item, data=request.data)
+    data = {k: v if v else None for k, v in request.data.items()}
+    serializer = ItemPostSerializer(item, data=data)
+    print(data)
+    print(serializer.is_valid())
     if serializer.is_valid():
         serializer.save()
         return Response({"status": "success"})
+    print(serializer.errors)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

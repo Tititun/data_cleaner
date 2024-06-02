@@ -5,11 +5,12 @@ import { HOST, headers } from '../constants';
 import { SaveModal } from './save_modal';
 
 
-export default function ({item, levels, updateItem, updateItems}) {
+export default function ({item, levels, updateItem, updateItems, brush}) {
   const [dropbar, setDropbar] = React.useState({})
   const [item_levels, setItemLevels] = React.useState({level_1: '', level_2: '', level_3: ''})
   const [modalUpdateData, setModalUpdateData] = React.useState({})
   const [isModalActive, setIsModalActive] = React.useState(false)
+  const [uncommitted, setUncommitted] = React.useState(false) 
 
   React.useEffect(() => {
     setItemLevels({
@@ -19,7 +20,22 @@ export default function ({item, levels, updateItem, updateItems}) {
     })
   }, [item])
 
+  React.useEffect(() => {
+    let flag = false;
+    for (let [level, value] of Object.entries(item_levels)) {
+      value = value || null
+      if ((item[level] !== value) && (item[`${level}_inferred`] !== value)) {
+        flag = true
+        break
+      }
+    }
+    setUncommitted(flag)
+  }, [item_levels])
+
   function levelClicked(e) {
+    if (brush) {
+      return
+    }
     const level = e.target.dataset.level;
     if (!level) {return}
     const names = []
@@ -96,24 +112,44 @@ export default function ({item, levels, updateItem, updateItems}) {
     if (savedLevels === JSON.stringify(item_levels)) {
       if (item['level_1'] || item['level_2'] || item['level_3']) {
         return 'has-background-info-light'}
-    } 
+    }
+    if (uncommitted) {
+      return 'has-background-warning-light'
+    }
     return ''
   }  
 
+  function levelClasses() {
+    if (brush) {
+      return ''
+    }
+    return 'is-clickable level-cell'
+  }
+
+  function rowClickHandler() {
+    if (!brush || brush === 'clean') {
+      return
+    }
+    item['level_1_inferred'] = ''
+    item['level_2_inferred'] = ''
+    item['level_3_inferred'] = ''
+    setItemLevels({level_1: brush[0], level_2: brush[1], level_3: brush[2]})
+  }
+
   return (
-      <tr key={item.id} className={getBackgroundColor()}>
+      <tr key={item.id} className={`${getBackgroundColor()} ${brush ? 'brush-clean' : ''}`} onClick={rowClickHandler}>
         <td className='w-5' key={1}>{item.source}</td>
         <td className='w-10'  key={2}>{item.category}</td>
         <td className='w-35'  key={3}>{item.name}</td>
-        <td data-level={1} className='w-15 has-text-centered is-clickable level-cell' key={5} onClick={levelClicked}>
+        <td data-level={1} className={`w-15 has-text-centered ${levelClasses()}`} key={5} onClick={levelClicked}>
           {dropbar?.['1'] ? <Dropdown currentName={item_levels.level_1} nameList={dropbar['1']} fullNameList={Object.keys(levels)} level="level_1"
            removeDropbar={closeDropdown}/>: item_levels.level_1}
         </td>
-        <td data-level={2} className='w-15 has-text-centered is-clickable level-cell' key={6} onClick={levelClicked}>
+        <td data-level={2} className={`w-15 has-text-centered ${levelClasses()}`} key={6} onClick={levelClicked}>
           {dropbar?.['2'] ? <Dropdown currentName={item_levels.level_2} nameList={dropbar['2']} fullNameList={Object.keys(levels)} level="level_2"
            removeDropbar={closeDropdown}/>: item_levels.level_2}
         </td>
-        <td data-level={3} className='w-10 has-text-centered is-clickable level-cell' key={7} onClick={levelClicked}>
+        <td data-level={3} className={`w-15 has-text-centered ${levelClasses()}`} key={7} onClick={levelClicked}>
          {dropbar?.['3'] ? <Dropdown currentName={item_levels.level_3} nameList={dropbar['3']} fullNameList={Object.keys(levels)} level="level_3"
            removeDropbar={closeDropdown}/>: item_levels.level_3}
         </td>

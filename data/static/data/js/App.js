@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom'
 import Item from './components/item'
 import { Pagination } from './components/pagination';
 import { fetchAndSet, searchReducer } from './utils';
-import { empty_filters, headers, HOST } from './constants';
+import { brush_clean, empty_filters, headers, HOST } from './constants';
 import { Categories } from './components/categories';
 import { Groups } from './components/groups';
 
@@ -60,6 +60,7 @@ function App() {
   const [selectedGroup, setSelectedGroup] = React.useState([])
   const [categories, setCategories] = React.useState({})
   const [selectedTab, setSelectedTab] = React.useState('categorized')
+  const [brush, setBrush] = React.useState(null)
 
 
   React.useEffect(() => {
@@ -111,7 +112,7 @@ function App() {
   React.useEffect(() => {
     update_levels(groups)
   }, [groups])
-  
+
   function anchorRequest (e) {
     e.preventDefault();
     // window.history.pushState({}, null, e.target.href);
@@ -143,6 +144,17 @@ function App() {
     setItems(new_items)
     fetchAndSet(`${HOST}/api/classified`, setGroups)
   }
+
+  function savePage() {
+  }
+
+  function palletteClick() {
+    if (brush) {
+      setBrush(null)
+    } else {
+      setBrush('clean')
+    }
+  }
   
   return (
     <div className="content mt-0 mx-3 mb-3">
@@ -155,6 +167,11 @@ function App() {
             </div>
             <div className="navbar-menu is-justify-content-center">
               <a role='button' className='navbar-item' onClick={() => setShowFilters(!showFilters)}>{showFilters ? 'Hide filters': 'Show filters'}</a>
+            </div>
+            <div className="navbar-menu is-justify-content-center">
+              <a role='button' className={`navbar-item ${brush ?'has-background-info-soft' : ''}`} onClick={palletteClick}>
+                {brush instanceof(Array) ? brush.join(' / ') : 'Select Pallette'}
+              </a>
             </div>
             <a className="navbar-item">
               <label className="checkbox">
@@ -198,11 +215,11 @@ function App() {
               <th className="col-title has-text-centered" key={5}>level 1</th>
               <th className="col-title has-text-centered" key={6}>level 2</th>
               <th className="col-title has-text-centered" key={7}>level 3</th>
-              <th className="col-title has-text-centered" key={8}></th>
+              <th className="col-title has-text-centered" key={8}><button className='button is-light' onClick={savePage}>Save page</button></th>
             </tr>
           </thead>
           <tbody>
-            {items && levels && items.map(item => <Item item={item} levels={levels} updateItem={updateItem} updateItems={updateItems} />)}
+            {items && levels && items.map(item => <Item item={item} levels={levels} updateItem={updateItem} updateItems={updateItems} brush={brush} />)}
           </tbody>
         </table>  
         <Pagination {...pagination} onClickFunc={anchorRequest} />
@@ -220,7 +237,7 @@ function App() {
             </ul>
           </div>
           <Groups groups={groups} appSetFilters={searchDispatcher} selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup}
-           hidden={selectedTab === 'categorized' ? false : true}/>
+           hidden={selectedTab === 'categorized' ? false : true}  brush={brush} setBrush={setBrush} />
           <Categories categories={categories} appSetFilters={searchDispatcher} appFilters={searchFilter}
            hidden={selectedTab !== 'categories_list' ? true : false} />
         </div>

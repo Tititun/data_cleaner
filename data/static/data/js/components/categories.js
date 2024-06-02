@@ -13,7 +13,7 @@ export const Categories = function({categories, hidden, appSetFilters, appFilter
     function searchHandler(value) {
       clearTimeout(timer)
       setSearch(value);
-      timer = setTimeout(() => setFilter(value), 400)
+      timer = setTimeout(() => setFilter(value), 500)
     }
 
     function rowClickHandler(category) {

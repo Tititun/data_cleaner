@@ -1,6 +1,7 @@
 import json
 import traceback
 
+from deep_translator import GoogleTranslator
 from django.db import connection
 from django.db.models import Count, Q
 import pandas as pd
@@ -8,7 +9,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from data.models import Item
+from data.models import Item, Translation
 from .paginators import ItemPagination
 from .serializers import ItemSerializer, ItemPostSerializer
 
@@ -26,13 +27,34 @@ def items_list(request):
             source = source[:2].upper + source[2:].lower()
         filters &= Q(source__startswith=source)
 
-    name = request.GET.get('name')
-    if name:
-        filters &= Q(name__iregex=name)
-
     category = request.GET.get('category')
     if category:
         filters &= Q(category__iregex=category)
+
+    language = request.GET.get('lang')
+    if language and language != 'null':
+        filters &= Q(language=language)
+
+    name = request.GET.get('name')
+    if name:
+        if language:
+            to = language if language != 'zh' else 'zh-CN'
+            tr = Translation.objects.filter(source='en', target=to,
+                                            original=name).first()
+            if tr:
+                print('found translation')
+                filters &= Q(name__iregex=tr.translation)
+            else:
+                try:
+                    translation = GoogleTranslator(source='en', target=to).translate(name)
+                    filters &= Q(name__iregex=translation)
+                    Translation.objects.create(source='en', target=to,
+                                               original=name, translation=translation)
+                except:
+                    print(traceback.format_exc())
+                    filters &= Q(name__iregex=name)
+        else:
+            filters &= Q(name__iregex=name)
 
     level_1 = request.GET.get('level_1')
     if level_1 and level_1 != 'null':

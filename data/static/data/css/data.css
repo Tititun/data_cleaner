@@ -126,11 +126,16 @@ nav.pagination {
 #groups-container {
   height: 100%;
   overflow: scroll;
+  padding-bottom: 100px;
 }
 
 #categories_container input {
   position: sticky;
   top: 0;
+}
+
+.lang-dropdown {
+  z-index: 3;
 }
 
 table.is-loading {

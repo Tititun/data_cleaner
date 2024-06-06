@@ -29,6 +29,10 @@ class Item(models.Model):
     level_2 = models.CharField(max_length=200, null=True)
     level_3 = models.CharField(max_length=200, null=True)
     translation = models.CharField(max_length=200, null=True)
+    language = models.CharField(max_length=2, null=True)
+    quantity = models.IntegerField(null=True)
+    weight = models.DecimalField(max_digits=7, decimal_places=4, null=True)
+    volume = models.DecimalField(max_digits=7, decimal_places=4, null=True)
 
     def infer_levels(self):
         if not self.category:
@@ -74,3 +78,13 @@ class Supermarket(models.Model):
         db_table = 'consumer_supermarket'
         app_label = 'data'
         managed = False
+
+
+class Translation(models.Model):
+    source = models.CharField(max_length=10, null=False)
+    target = models.CharField(max_length=10, null=False)
+    original = models.CharField(max_length=100, null=False)
+    translation = models.CharField(max_length=100, null=False)
+
+    class Meta:
+        db_table = 'translation'

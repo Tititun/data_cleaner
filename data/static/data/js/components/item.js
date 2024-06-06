@@ -150,7 +150,7 @@ export default function ({item, levels, updateItem, updateItems, brush, setTemp}
       <tr key={item.id} className={`${getBackgroundColor()} ${brush ? 'brush-clean' : ''}`} onClick={rowClickHandler}>
         <td className='w-5' key={1}>{item.source}</td>
         <td className='w-10'  key={2}>{item.category}</td>
-        <td className='w-35'  key={3}>{item.name}</td>
+        <td className='w-30'  key={3}>{item.name}</td>
         <td data-level={1} className={`w-15 has-text-centered ${levelClasses()}`} key={5} onClick={levelClicked}>
           {dropbar?.['1'] ? <Dropdown currentName={item_levels.level_1} nameList={dropbar['1']} fullNameList={Object.keys(levels)} level="level_1"
            removeDropbar={closeDropdown}/>: item_levels.level_1}
@@ -163,7 +163,7 @@ export default function ({item, levels, updateItem, updateItems, brush, setTemp}
          {dropbar?.['3'] ? <Dropdown currentName={item_levels.level_3} nameList={dropbar['3']} fullNameList={Object.keys(levels)} level="level_3"
            removeDropbar={closeDropdown}/>: item_levels.level_3}
         </td>
-        <td className='w-5'  key={8}>
+        <td className='w-10'  key={8}>
           <div className='is-flex'>
             <button className='button m-0 has-background-primary-light mr-1' onClick={() => saveItem(false)}>Save</button>
             <button className='button is-light mr-1 has-background-danger-light' onClick={saveAllItems}>Save all</button>

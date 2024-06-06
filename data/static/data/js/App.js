@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom'
 import Item from './components/item'
 import { Pagination } from './components/pagination';
 import { fetchAndSet, searchReducer } from './utils';
-import { brush_clean, empty_filters, headers, HOST } from './constants';
+import { empty_filters, headers, HOST, langs } from './constants';
 import { Categories } from './components/categories';
 import { Groups } from './components/groups';
 
@@ -49,7 +49,7 @@ function update_levels(groups) {
 
 
 function App() {
-  const [showFilters, setShowFilters] = React.useState(false)
+  const [showFilters, setShowFilters] = React.useState(true)
   const [isLoading, setIsLoading] = React.useState(false)
   const [pagination, setPagination] = React.useState({currentPage: 1, maxPage: null, prev: null, next: null})
   
@@ -62,7 +62,7 @@ function App() {
   const [selectedTab, setSelectedTab] = React.useState('categorized')
   const [brush, setBrush] = React.useState(null)
   const [temp, setTemp] = React.useState({})
-
+  const [lang, setLang] = React.useState(false)
 
   React.useEffect(() => {
     let didCancel = false;
@@ -112,15 +112,12 @@ function App() {
   }, [])
   
   React.useEffect(() => {
-    let timeout = setTimeout(() => {
-        setUrl(`${HOST}/api/items?` + new URLSearchParams(searchFilter).toString())
-    }, 300)
-    return () => clearTimeout(timeout)
-  }, [searchFilter])
-
-  React.useEffect(() => {
     update_levels(groups)
   }, [groups])
+
+  function applyFilters () {
+      setUrl(`${HOST}/api/items?` + new URLSearchParams(searchFilter).toString())
+  }
 
   function anchorRequest (e) {
     e.preventDefault();
@@ -222,26 +219,45 @@ function App() {
           <thead>
             {
               showFilters ?
-              <tr>
-                <th className="col-title" key={1}>
-                  <input class="input" type="text" value={searchFilter['source']} onChange={e => searchDispatcher({type: 'source', value: e.target.value})}></input>
+              <tr style={{zIndex: 3}}>
+                <th className="w-5 col-title" key={1}>
+                  <input className="input" type="text" value={searchFilter['source']} onChange={e => searchDispatcher({type: 'source', value: e.target.value})}></input>
                 </th>
-                <th className="col-title" key={2}>
-                  <input class="input" type="text" value={searchFilter['category']} onChange={e => searchDispatcher({type: 'category', value: e.target.value})}></input>
+                <th className="w-10 col-title" key={2}>
+                  <input className="input column col-10" type="text" value={searchFilter['category']} onChange={e => searchDispatcher({type: 'category', value: e.target.value})}></input>
                 </th>
-                <th className="col-title" key={3}>
-                  <input class="input" type="text" value={searchFilter['name']} onChange={e => searchDispatcher({type: 'name', value: e.target.value})}></input>
+                <th className="w-30 col-title" key={3}>
+                  <div className='columns is-align-items-center is-flex'>
+                    <input className="input column col-10" type="text" value={searchFilter['name']} onChange={e => searchDispatcher({type: 'name', value: e.target.value})}></input>
+                    <div className={`${lang ? 'is-active' : ''} dropdown column col-2`} style={{maxWidth: '25%'}}>
+                      <div className="dropdown-trigger">
+                        <button onClick={() => setLang(!lang)} className="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                          {searchFilter['lang']}<span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/></svg></span>
+                        </button>
+                      </div>
+                      <div className="dropdown-menu" id="dropdown-menu" role="menu">
+                        <div className="dropdown-content p-0" style={{width: '50px'}}>
+                          {langs.map(lang => {
+                            return <a href="#" className={`${searchFilter['lang'] === lang ? 'is-active' : ''} dropdown-item lang-dropdown`}
+                                    onClick={e => {e.preventDefault();searchDispatcher({type: 'lang', value: lang}); setLang(false)}}>{lang}</a>
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </th>
-                <th className="col-title" key={5}>
-                  <input class="input" type="text" value={searchFilter['level_1']} onChange={e => searchDispatcher({type: 'level_1', value: e.target.value})}></input>
+                <th className="w-15 col-title" key={5}>
+                  <input className="input" type="text" value={searchFilter['level_1']} onChange={e => searchDispatcher({type: 'level_1', value: e.target.value})}></input>
                 </th>
-                <th className="col-title" key={6}>
-                  <input class="input" type="text" value={searchFilter['level_2']} onChange={e => searchDispatcher({type: 'level_2', value: e.target.value})}></input>
+                <th className="w-15 col-title" key={6}>
+                  <input className="input" type="text" value={searchFilter['level_2']} onChange={e => searchDispatcher({type: 'level_2', value: e.target.value})}></input>
                 </th>
-                <th className="col-title" key={7}>
-                  <input class="input" type="text" value={searchFilter['level_3']} onChange={e => searchDispatcher({type: 'level_3', value: e.target.value})}></input>
+                <th className="w-15 col-title" key={7}>
+                  <input className="input" type="text" value={searchFilter['level_3']} onChange={e => searchDispatcher({type: 'level_3', value: e.target.value})}></input>
                 </th>
-                <th className="col-title" key={8}></th>
+                <th className="w-10 col-title has-text-centered" key={8}>
+                  <button className='button is-light' onClick={applyFilters}>Apply filters</button>
+                </th>
               </tr>
               : null
             }
@@ -291,4 +307,3 @@ ReactDOM.render(
     <App />,
     document.getElementById("root")
 );
-

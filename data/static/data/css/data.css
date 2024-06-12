@@ -138,6 +138,10 @@ nav.pagination {
   z-index: 3;
 }
 
+.cm-cell {
+  vertical-align: middle !important;
+}
+
 table.is-loading {
   position: relative;
   pointer-events: none;

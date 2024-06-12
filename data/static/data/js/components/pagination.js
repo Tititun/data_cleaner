@@ -1,7 +1,7 @@
 import React from 'react';
 import { HOST } from "../constants"
 
-export const Pagination = function({currentPage, maxPage, prev, next, onClickFunc}) {
+export const Pagination = function({currentPage, maxPage, prev, next, href, onClickFunc}) {
 
     const page_numbers = [...Array(maxPage + 1).keys()].filter(
         i => ((i >= currentPage - 3 && i <= currentPage + 3 && i > 0) || (i === 1 || i === maxPage))
@@ -16,7 +16,7 @@ export const Pagination = function({currentPage, maxPage, prev, next, onClickFun
         prev_page = i;
         links.push(
             <li>
-                <a href={`${HOST}/api/items?page=${i}`}
+                <a href={href ? `${href}?page=${i}` : `${HOST}/api/items?page=${i}`}
                    className={`pagination-link ${currentPage === i ? 'is-current' : ''}`}
                    onClick={onClickFunc}>{i}</a>
             </li>

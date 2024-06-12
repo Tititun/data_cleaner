@@ -1,17 +1,34 @@
 import json
+import os
 import traceback
+from pathlib import Path
 
 from deep_translator import GoogleTranslator
-from django.db import connection
-from django.db.models import Count, Q
+from django.db.models import F, Q
+import numpy as np
 import pandas as pd
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from sklearn.metrics import confusion_matrix as cmatrix
+import torch
+from torch.nn import functional
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 from data.models import Item, Translation
 from .paginators import ItemPagination
-from .serializers import ItemSerializer, ItemPostSerializer
+from .serializers import (ItemSerializer, ItemPostSerializer,
+                          ItemPredictedSerializer)
+from .utils import clean
+
+MODEL_PATH = Path(__file__).parent.parent / 'models'
+TOKENIZER_PATH = MODEL_PATH / 'tokenizer'
+
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
+model = model.to('cuda' if torch.cuda.is_available() else 'cpu')
+tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_PATH)
+with open(os.path.join(Path(__file__).parent, 'idx_to_label.json')) as f:
+    idx_to_label = {int(k): v for k,v in json.load(f).items()}
 
 
 @api_view(['GET'])
@@ -32,7 +49,7 @@ def items_list(request):
         filters &= Q(category__iregex=category)
 
     language = request.GET.get('lang')
-    if language and language != 'null':
+    if language and language not in ['nen', 'null']:
         filters &= Q(language=language)
 
     name = request.GET.get('name')
@@ -78,6 +95,7 @@ def items_list(request):
                 (Q(level_1__isnull=False) |
                  Q(level_2__isnull=False) |
                  Q(level_3__isnull=False)) if not show_classified else Q())
+            .exclude(Q(language='en') if language == 'nen' else Q())
     )
     result_page = paginator.paginate_queryset(items, request)
     data = ItemSerializer(result_page, many=True).data
@@ -89,8 +107,6 @@ def set_item_levels(request):
     item = Item.objects.get(id=request.data['id'])
     data = {k: v if v else None for k, v in request.data.items()}
     serializer = ItemPostSerializer(item, data=data)
-    print(data)
-    print(serializer.is_valid())
     if serializer.is_valid():
         serializer.save()
         return Response({"status": "success"})
@@ -193,3 +209,61 @@ def classified(request):
         level_1, level_2, level_3 = gr_3
         groups[level_1]['groups'][level_2]['groups'][level_3] = count_3
     return Response(groups)
+
+
+@api_view(['GET'])
+def model_results(request):
+    paginator = ItemPagination()
+    paginator.page_size = 100
+    items = Item.objects.filter(is_test=True).exclude(level_3=F('predicted'))
+    result_page = paginator.paginate_queryset(items, request)
+    serializer = ItemPredictedSerializer(result_page, many=True)
+    data = serializer.data
+    return paginator.get_paginated_response(data)
+
+
+@api_view(['GET'])
+def confusion_matrix(request):
+    data = (
+        Item.objects.filter(is_test=True, level_3__isnull=False)
+                    .values_list('level_3', 'predicted')
+    )
+    labels = [d[0] for d in data]
+    predictions = [d[1] for d in data]
+    names = sorted(list(set(labels)))
+    cm = cmatrix(labels, predictions, labels=names, normalize='true').round(3)
+    return Response({'cm': cm, 'labels': names})
+
+
+@api_view(['GET'])
+def confusion_matrix_errors(request):
+    label = request.GET['label']
+    print(label)
+    items = Item.objects.filter(level_3=label).exclude(predicted=label)
+    data = ItemPredictedSerializer(items, many=True).data
+    return Response({'data': data})
+
+
+@api_view(['GET'])
+def get_random_predictions(request):
+    items = Item.objects.filter(level_3__isnull=True).exclude(source='AE_carrefour').order_by('?').values(
+        'id', 'name', 'source', 'language', 'category')[:20]
+    texts = [clean(i['name']) for i in items]
+    tokenized = tokenizer(texts, padding=True, truncation=True, max_length=50,
+                          return_tensors="pt")
+    for k, v in tokenized.items():
+        tokenized[k] = v.to(model.device)
+    with torch.no_grad():
+        res = model(**tokenized).logits.to('cpu')
+    probabilities_scores = functional.softmax(res.detach(), dim=-1).numpy()
+    print(probabilities_scores.shape)
+    probs = [p.argsort()[-3:][::-1] for p in probabilities_scores]
+    top_predictions = [
+        [{'category': idx_to_label[a],
+          'prob': probabilities_scores[idx][a]}
+         for a in [*item]] for idx, item in enumerate(probs)
+    ]
+    for idx, item in enumerate(items):
+        item['predictions'] = top_predictions[idx]
+
+    return Response({'data': items})

@@ -33,6 +33,9 @@ class Item(models.Model):
     quantity = models.IntegerField(null=True)
     weight = models.DecimalField(max_digits=7, decimal_places=4, null=True)
     volume = models.DecimalField(max_digits=7, decimal_places=4, null=True)
+    is_test = models.BooleanField(null=False)
+    predicted = models.CharField(max_length=50, null=False)
+    inferred_from_upc = models.BooleanField(null=True)
 
     def infer_levels(self):
         if not self.category:
@@ -64,6 +67,22 @@ class Item(models.Model):
         managed=False
 
 
+class Prediction(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE,
+                             related_name='predictions', null=False)
+    category = models.CharField(max_length=100, null=False)
+    prob = models.FloatField(null=False)
+
+    class Meta:
+        db_table = 'item_prediction'
+        constraints = [
+            models.UniqueConstraint(fields=['item', 'category'],
+                                    name='item_category_prediction_constraint')
+        ]
+
+        ordering = ['-prob']
+
+
 class Supermarket(models.Model):
     source = models.CharField(max_length=45)
     country = models.CharField(max_length=2)
@@ -83,8 +102,11 @@ class Supermarket(models.Model):
 class Translation(models.Model):
     source = models.CharField(max_length=10, null=False)
     target = models.CharField(max_length=10, null=False)
-    original = models.CharField(max_length=100, null=False)
-    translation = models.CharField(max_length=100, null=False)
+    original = models.CharField(max_length=1000, null=True)
+    translation = models.CharField(max_length=1000, null=False)
+    from_item = models.BooleanField(null=True)
+    category = models.CharField(max_length=100, null=True)
 
     class Meta:
+        managed=False
         db_table = 'translation'
